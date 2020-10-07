@@ -1,0 +1,19 @@
+{
+  "name": "sevi/api.uniondistribuidora.com",
+  "description": "A restFULL API with Slim Framework for uniondistribuidora.com",
+  "authors": [
+    {
+      "name": "Antonio J. Sevillano",
+      "email": "correo@ajsevillano.com"
+    }
+  ],
+  "require": {
+    "slim/slim": "4.*",
+    "slim/psr7": "^1.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "APP\\": "src/"
+    }
+  }
+}
