@@ -1,18 +1,8 @@
 <?php
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
-use Slim\Factory\AppFactory;
 
-require __DIR__ . '/../../vendor/autoload.php';
+//Root (Homepage) route
+$app->get('/', '\APP\controllers\home:index');
 
-$app = AppFactory::create();
-
-$app->get('/', function (Request $request, Response $response, $args) {
-    $response->getBody()->write("Hello world!");
-    return $response;
-});
-
-$app->get('/products', function (Request $request, Response $response, $args) {
-  $response->getBody()->write("Hello world! productos");
-  return $response;
-});
+//Products GET routes
+$app->get('/products', '\APP\controllers\products:index');
+$app->get('/products/{id}', '\APP\controllers\products:getID');
