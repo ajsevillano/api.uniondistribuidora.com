@@ -1,10 +1,7 @@
-<?php
-use Slim\Factory\AppFactory;
+<?php namespace APP\core;
 
 require __DIR__ . '/../../vendor/autoload.php';
+use APP\core\router as router;
 
-$app = AppFactory::create();
-
-require __DIR__ . '/router.php';
-
-$app->run();
+$runAPP = new router();
+$runAPP->loadApp();

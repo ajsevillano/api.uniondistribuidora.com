@@ -1,8 +1,22 @@
-<?php
+<?php namespace APP\core;
 
-//Root (Homepage) route
-$app->get('/', '\APP\controllers\home:index');
+use Slim\Factory\AppFactory;
 
-//Products GET routes
-$app->get('/products', '\APP\controllers\products:index');
-$app->get('/products/{id}', '\APP\controllers\products:getID');
+class router
+{
+  private $app;
+  public function loadApp()
+  {
+    //Get the slim objet
+    $this->app = AppFactory::create();
+
+    //Root (Homepage) route
+    $this->app->get('/', '\APP\controllers\home:index');
+
+    //Products GET routes
+    $this->app->get('/products', '\APP\controllers\products:index');
+    $this->app->get('/products/{id}', '\APP\controllers\products:getID');
+
+    return $this->app->run();
+  }
+}
