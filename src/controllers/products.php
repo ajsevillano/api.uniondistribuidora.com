@@ -3,20 +3,25 @@
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+use APP\models\products as productsRequest;
+
 class products
 {
-    public function index(Request $request, Response $response, $arg)
+    public function index(Request $request, Response $response)
     {
+        $objectProductsRequest = new productsRequest();
+        $objectProductsRequest->getAll();
+
         $route = $request->getUri()->getPath();
         $home = json_encode(['Controller' => $route], JSON_PRETTY_PRINT);
         $response->getBody()->write($home);
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-    public function getID($request, $response, $arg)
+    public function getID($response, $arg)
     {
-        $payload = json_encode(['id' => $arg['id']], JSON_PRETTY_PRINT);
-        $response->getBody()->write($payload);
+        $theID = json_encode(['id' => $arg['id']], JSON_PRETTY_PRINT);
+        $response->getBody()->write($theID);
         return $response->withHeader('Content-Type', 'application/json');
     }
 }

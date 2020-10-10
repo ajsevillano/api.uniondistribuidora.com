@@ -1,8 +1,8 @@
-<?php
-namespace App\config;
+<?php namespace APP\config;
+
 
 /* Main db class */
-class Conexion
+class db
 {
     private $configuracion = [
         'dsn' => 'mysql:host=localhost;dbname=db775411928;charset=utf8',
