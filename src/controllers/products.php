@@ -10,18 +10,22 @@ class products
     public function index(Request $request, Response $response)
     {
         $objetProductsList = new productsRequest();
-        $objetProductsList->getAll();
+        $resultQueryAll = $objetProductsList->getAll();
 
-        $route = $request->getUri()->getPath();
-        $home = json_encode(['Controller' => $route], JSON_PRETTY_PRINT);
-        $response->getBody()->write($home);
+        //Return all the products in an json object
+        $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
+        $response->getBody()->write($encodeResult);
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-    public function getID(Request $request,Response $response, $arg)
+    public function getID(Request $request, Response $response, $arg)
     {
-        $theID = json_encode(['id' => $arg['id']], JSON_PRETTY_PRINT);
-        $response->getBody()->write($theID);
+        $objetProductId = new productsRequest();
+        $resultQueryId = $objetProductId->getId($arg);
+
+        //Return the Product ID in an json object
+        $encodeResult = json_encode($resultQueryId, JSON_PRETTY_PRINT);
+        $response->getBody()->write($encodeResult);
         return $response->withHeader('Content-Type', 'application/json');
     }
 }

@@ -21,7 +21,7 @@ class products
 		$pdoContent = $dbh->obtenerPDO();
 		$consulta = $pdoContent->prepare($sql);
 		$consulta->execute();
-		return $consulta->fetchAll(\PDO::FETCH_ASSOC);
+		return $consulta->fetchAll(\PDO::FETCH_OBJ);
 	}
 	
 	public function getId($theId) {
