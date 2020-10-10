@@ -21,7 +21,7 @@ class products
     public function getID(Request $request, Response $response, $arg)
     {
         $objetProductId = new productsRequest();
-        $resultQueryId = $objetProductId->getId($arg);
+        $resultQueryId = $objetProductId->getId($arg['id']);
 
         //Return the Product ID in an json object
         $encodeResult = json_encode($resultQueryId, JSON_PRETTY_PRINT);
