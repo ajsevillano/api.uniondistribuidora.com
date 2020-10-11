@@ -16,9 +16,12 @@ class router
     //Root (Homepage) route - Static view using Php view library.
     $this->app->get('/', '\APP\controllers\home:index');
 
-    //Products GET routes
-    $this->app->get('/products', '\APP\controllers\products:index');
+    //GET Routes
+    $this->app->get('/products', '\APP\controllers\products:getAll');
     $this->app->get('/products/{id:[0-9]+}', '\APP\controllers\products:getID');
+
+    //POST Routes
+    $this->app->post('/products', '\APP\controllers\products:CreateNewProduct');
 
     return $this->app->run();
   }

@@ -28,4 +28,12 @@ class products
         $response->getBody()->write($encodeResult);
         return $response->withHeader('Content-Type', 'application/json');
     }
+
+    public function CreateNewProduct(Request $request, Response $response, $arg)
+    {
+        $postTest = 'The POST method works!';
+        $encodeResult = json_encode($postTest, JSON_PRETTY_PRINT);
+        $response->getBody()->write($encodeResult);
+        return $response->withHeader('Content-Type', 'application/json');
+    }
 }
