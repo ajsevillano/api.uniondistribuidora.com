@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <title>Uniondistribuidora.com RESTapi</title>
+</head>
+<body>
+    <div class="header">
+        <h1>Union Distribuidora RESTapi <span>v1.0</span></h1>
+    </div>
+    <main>
+        <section class="intro">
+            <div class="section-block"><!-- bloque flex -->
+            <h3>Información de la API</h3>
+            <p>Esta es una API de consumo. solo el metodo <span class="green">HTTP GET</span> esta disponible.No se requiere autentificación para acceder a esta API.La version de esta API no está especificada en la cabecera como ocurre en otras RESTApi.</p>
+            <div>
+            <hr>
+            <div class="section-block">
+            <h3>Recurso /products/</h3>
+            <p>Invocar el endpoind /products/ devolverá un listado completo del catálogo de productos en formato JSON.</p>
+            <div class="code"> <span class="tag">GET</span> http://api.uniondistribuidora.com/products/</div>
+            <p class="caption">En este caso nos devolvera un archivo JSON con toda la informacion de todos los productos.</p>
+            <p>Si añadimos un {id} detras de /products/ nos devolvera un JSON con la información del producto con esa ID.</p>
+            <div class="code"> <span class="tag">GET</span> http://api.uniondistribuidora.com/products/<b>34</b></div>
+            <p class="caption">En este caso nos devolvera un archivo JSON con la información del producto 34.</p>
+            <div>
+            <hr>
+            <div class="section-block">
+                <h3>Manejo de errores</h3>
+                <p>Invocar un endpoind diferente a /products/ le devolverá al directorio raiz donde se encuentra esta guia. Por otro lado, si invoca un endpoind con una id no válida o que no se encuentra en la base de datos el endpoind le devolvera un error en forma de JSON con dos valores: un mensaje de error en español y un mensaje de error en inglés:</p>
+                <div class="code"> <span class="tag-error">ERROR</span> [{"error_Es":"item X no encontrado","error_En":"item X not found"}]</div>
+            </div>
+        </section>
+    </main>
+     <!-- Footer legal -->
+     <section class="footer">
+        <div class="footer-content">Diseñado y mantenido por <a href="http://www.ajsevillano.es"> AJ Sevillano</a> ®2020</div>
+      </section>
+    </footer>
+</body>
+</html>
