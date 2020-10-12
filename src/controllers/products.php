@@ -7,7 +7,7 @@ use APP\models\products as productsRequest;
 
 class products
 {
-    public function index(Request $request, Response $response)
+    public function getAll(Request $request, Response $response)
     {
         $objetProductsList = new productsRequest();
         $resultQueryAll = $objetProductsList->getAll();
@@ -29,7 +29,7 @@ class products
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-    public function CreateNewProduct(Request $request, Response $response, $arg)
+    public function CreateNewProduct(Response $response, $arg)
     {
         $postTest = 'The POST method works!';
         $encodeResult = json_encode($postTest, JSON_PRETTY_PRINT);
