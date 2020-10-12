@@ -122,14 +122,18 @@ hr {
 }
 
 @media only screen and (max-width: 600px) {
+  .intro {
+    padding: 1.6rem;
+  }
+
   .section-block {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    text-align: center;
     margin: auto;
     max-width: 30rem;
+    text-align: left;
   }
 
   .code {

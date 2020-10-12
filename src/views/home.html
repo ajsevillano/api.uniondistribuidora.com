@@ -29,8 +29,11 @@
             <hr>
             <div class="section-block">
                 <h3>Manejo de errores</h3>
-                <p>Invocar un endpoind diferente a /products/ le devolverá al directorio raiz donde se encuentra esta guia. Por otro lado, si invoca un endpoind con una id no válida o que no se encuentra en la base de datos el endpoind le devolvera un error en forma de JSON con dos valores: un mensaje de error en español y un mensaje de error en inglés:</p>
-                <div class="code"> <span class="tag-error">ERROR</span> [{"error_Es":"item X no encontrado","error_En":"item X not found"}]</div>
+                <p>Invocar un endpoind diferente a /products/ le devolverá un error 404 Not found. Por otro lado, si invoca un endpoind con una id no válida o que no se encuentra en la base de datos el endpoind le devolvera un error en forma de JSON con dos valores:</p>
+                <div class="code"> <span class="tag-error">ERROR</span> {
+                    "status": "error",
+                    "Message": "The item 456 you requested do not exist"
+                }</div>
             </div>
         </section>
     </main>
