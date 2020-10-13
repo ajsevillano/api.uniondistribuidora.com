@@ -45,11 +45,30 @@ class products
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-    public function CreateNewProduct(Response $response, $arg)
+    public function CreateNewProduct(Request $request, Response $response, $arg)
     {
-        $postTest = 'The POST method works!';
-        $encodeResult = json_encode($postTest, JSON_PRETTY_PRINT);
-        $response->getBody()->write($encodeResult);
+        //Get the date in timestamp format
+        $currentDate = new \DateTime();
+        
+        //Get the data from the POST request in json and decode it.
+        $getDataFromPost = json_decode($request->getBody());
+
+        //Filter and store the post data into variables
+        $tipo = htmlspecialchars($getDataFromPost->tipo);
+        $marca = htmlspecialchars($getDataFromPost->marca);
+        $tamano = htmlspecialchars($getDataFromPost->tamano);
+        $nombre = htmlspecialchars($getDataFromPost->nombre);
+        $activo = htmlspecialchars($getDataFromPost->activo);
+        $lastupdate = $currentDate->getTimestamp();
+
+        $encodeMsg = json_encode( [
+            'status' => 'ok',
+            'Message' =>
+                'The product ' .
+                $nombre .
+                ' has been added to the data base',
+        ], JSON_PRETTY_PRINT);
+        $response->getBody()->write($encodeMsg);
         return $response->withHeader('Content-Type', 'application/json');
     }
 }
