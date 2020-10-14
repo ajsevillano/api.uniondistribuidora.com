@@ -19,12 +19,16 @@ class router
     //GET Routes
     $this->app->get('/products', '\APP\controllers\products:getAll');
     $this->app->get('/products/{id:[0-9]+}', '\APP\controllers\products:getID');
+    $this->app->get('/customers', '\APP\controllers\customers:getAll');
+    $this->app->get('/customers/{id:[0-9]+}', '\APP\controllers\customers:getID');
 
     //POST Routes
     $this->app->post('/products', '\APP\controllers\products:CreateNewProduct');
+    $this->app->post('/customers', '\APP\controllers\customers:CreateNewProduct');
 
     //PUT Routes
     $this->app->put('/products', '\APP\controllers\products:UpdateProduct');
+    $this->app->put('/customers', '\APP\controllers\customers:UpdateProduct');
 
     return $this->app->run();
   }
