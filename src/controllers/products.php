@@ -2,7 +2,6 @@
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-
 use APP\models\products as productsRequest;
 
 class products
@@ -38,7 +37,7 @@ class products
             $response->getBody()->write($emptyResult);
             return $response->withHeader('Content-Type', 'application/json');
         }
-        
+
         //Return the Product ID in an json object
         $encodeResult = json_encode($resultQueryId, JSON_PRETTY_PRINT);
         $response->getBody()->write($encodeResult);
@@ -49,7 +48,7 @@ class products
     {
         //Get the date in timestamp format
         $currentDate = new \DateTime();
-        
+
         //Get the data from the POST request in json and decode it.
         $getDataFromPost = json_decode($request->getBody());
 
@@ -58,16 +57,31 @@ class products
         $marca = htmlspecialchars($getDataFromPost->marca);
         $tamano = htmlspecialchars($getDataFromPost->tamano);
         $nombre = htmlspecialchars($getDataFromPost->nombre);
-        $activo = htmlspecialchars($getDataFromPost->activo);
+        $estado = htmlspecialchars($getDataFromPost->activo);
         $lastupdate = $currentDate->getTimestamp();
 
-        $encodeMsg = json_encode( [
-            'status' => 'ok',
-            'Message' =>
-                'The product ' .
-                $nombre .
-                ' has been added to the data base',
-        ], JSON_PRETTY_PRINT);
+        //Instance the model class
+        $objetProductsList = new productsRequest();
+        $objetProductsList->insertNewProduct(
+            $nombre,
+            $tamano,
+            $marca,
+            $tipo,
+            $estado,
+            $lastupdate
+        );
+
+        //Return a json objet confirming the product has been added to the db
+        $encodeMsg = json_encode(
+            [
+                'status' => 'ok',
+                'Message' =>
+                    'The product ' .
+                    $nombre .
+                    ' has been added to the data base',
+            ],
+            JSON_PRETTY_PRINT
+        );
         $response->getBody()->write($encodeMsg);
         return $response->withHeader('Content-Type', 'application/json');
     }
