@@ -23,6 +23,9 @@ class router
     //POST Routes
     $this->app->post('/products', '\APP\controllers\products:CreateNewProduct');
 
+    //PUT Routes
+    $this->app->put('/products', '\APP\controllers\products:UpdateProduct');
+
     return $this->app->run();
   }
 }

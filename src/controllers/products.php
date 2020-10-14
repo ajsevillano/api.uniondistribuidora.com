@@ -50,14 +50,14 @@ class products
         $currentDate = new \DateTime();
 
         //Get the data from the POST request in json and decode it.
-        $getDataFromPost = json_decode($request->getBody());
+        $getDataFromPut = json_decode($request->getBody());
 
         //Filter and store the post data into variables
-        $tipo = htmlspecialchars($getDataFromPost->tipo);
-        $marca = htmlspecialchars($getDataFromPost->marca);
-        $tamano = htmlspecialchars($getDataFromPost->tamano);
-        $nombre = htmlspecialchars($getDataFromPost->nombre);
-        $estado = htmlspecialchars($getDataFromPost->activo);
+        $tipo = htmlspecialchars($getDataFromPut->tipo);
+        $marca = htmlspecialchars($getDataFromPut->marca);
+        $tamano = htmlspecialchars($getDataFromPut->tamano);
+        $nombre = htmlspecialchars($getDataFromPut->nombre);
+        $estado = htmlspecialchars($getDataFromPut->activo);
         $lastupdate = $currentDate->getTimestamp();
 
         //Instance the model class
@@ -79,6 +79,47 @@ class products
                     'The product ' .
                     $nombre .
                     ' has been added to the data base',
+            ],
+            JSON_PRETTY_PRINT
+        );
+        $response->getBody()->write($encodeMsg);
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
+    public function UpdateProduct(Request $request, Response $response, $arg)
+    {
+        //Get the date in timestamp format
+        $currentDate = new \DateTime();
+
+        //Get the data from the POST request in json and decode it.
+        $getDataFromPut = json_decode($request->getBody());
+
+        //Filter and store the post data into variables
+        $Theid = htmlspecialchars($getDataFromPut->id);
+        $tipo = htmlspecialchars($getDataFromPut->tipo);
+        $marca = htmlspecialchars($getDataFromPut->marca);
+        $tamano = htmlspecialchars($getDataFromPut->tamano);
+        $nombre = htmlspecialchars($getDataFromPut->nombre);
+        $estado = htmlspecialchars($getDataFromPut->activo);
+        $lastupdate = $currentDate->getTimestamp();
+
+        //Instance the model class
+        $objetProductsList = new productsRequest();
+        $objetProductsList->updateProduct(
+            $Theid,
+            $tipo,
+            $nombre,
+            $estado,
+            $tamano,
+            $marca,
+            $lastupdate
+        );
+
+        //Return a json objet confirming the product has been added to the db
+        $encodeMsg = json_encode(
+            [
+                'status' => 'ok',
+                'Message' => 'The product ' . $Theid . ' has been updated',
             ],
             JSON_PRETTY_PRINT
         );

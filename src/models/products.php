@@ -62,4 +62,32 @@ class products
         $consulta->bindValue(':lastupdate', $lastupdate, \PDO::PARAM_INT);
         $consulta->execute();
     }
+
+    public function updateProduct(
+        $Theid,
+        $tipo,
+        $nombre,
+        $estado,
+        $tamano,
+        $marca,
+        $lastupdate
+    ) {
+        $sql = "
+              UPDATE catalogo 
+              SET tipo = :tipo, marca = :productoMarca, tamano = :productoTamano, nombre = :productoNombre, activo = :estado, last_update = :lastupdate
+              WHERE id = :id
+          ";
+
+        $dbh = new connection();
+        $pdoContent = $dbh->obtenerPDO();
+        $consulta = $pdoContent->prepare($sql);
+        $consulta->bindValue(':id', $Theid, \PDO::PARAM_INT);
+        $consulta->bindValue(':tipo', $tipo, \PDO::PARAM_STR);
+        $consulta->bindValue(':productoNombre', $nombre, \PDO::PARAM_STR);
+        $consulta->bindValue(':estado', $estado, \PDO::PARAM_INT);
+        $consulta->bindValue(':productoTamano', $tamano, \PDO::PARAM_STR);
+        $consulta->bindValue(':productoMarca', $marca, \PDO::PARAM_STR);
+        $consulta->bindValue(':lastupdate', $lastupdate, \PDO::PARAM_INT);
+        $consulta->execute();
+    }
 }
