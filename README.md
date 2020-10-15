@@ -1,4 +1,4 @@
-# PHP Basic restful API
+# PHP Slim 4 Basic restful API
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/f6fe2d1c42334960bcc3bf7c3b0ccea8)](https://www.codacy.com/gh/ajsevillano/api.uniondistribuidora.com/dashboard?utm_source=github.com&utm_medium=referral&utm_content=ajsevillano/api.uniondistribuidora.com&utm_campaign=Badge_Grade)
 
@@ -6,7 +6,7 @@ This is a basic RESTful API designed for a customer.The API will allow you to fe
 
 ## Motivation
 
-Despite of my frontend background, I wanted to create a basic Restapi in PHP to serve as backend on some of my projects.
+Despite of my frontend background, I wanted to create a basic Restapi in PHP using [PHP Slim 4 framework](http://www.slimframework.com/) to serve as backend on some of my projects.
 
 ## Installation
 
