@@ -1,0 +1,2 @@
+# api.uniondistribuidora.com
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/8a7f33375fc543208881fe979dd05bea)](https://app.codacy.com/gh/ajsevillano/api.uniondistribuidora.com?utm_source=github.com&utm_medium=referral&utm_content=ajsevillano/api.uniondistribuidora.com&utm_campaign=Badge_Grade_Settings)
