@@ -24,11 +24,11 @@ class router
 
     //POST Routes
     $this->app->post('/products', '\APP\controllers\products:CreateNewProduct');
-    $this->app->post('/customers', '\APP\controllers\customers:CreateNewProduct');
+    $this->app->post('/customers', '\APP\controllers\customers:CreateNewCustomer');
 
     //PUT Routes
     $this->app->put('/products', '\APP\controllers\products:UpdateProduct');
-    $this->app->put('/customers', '\APP\controllers\customers:UpdateProduct');
+    $this->app->put('/customers', '\APP\controllers\customers:UpdateCustomer');
 
     return $this->app->run();
   }
