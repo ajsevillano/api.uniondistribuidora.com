@@ -35,6 +35,21 @@ class products
             $objetProductId = new productsRequest();
             $resultQueryId = $objetProductId->getId($arg['id']);
             if (empty($resultQueryId)) {
+                $emptyResult = json_encode(
+                    [
+                        'status' => 'error',
+                        'Message' =>
+                            'The item ' .
+                            $arg['id'] .
+                            ' you requested do not exist',
+                    ],
+                    JSON_PRETTY_PRINT
+                );
+                $response->getBody()->write($emptyResult);
+                return $response->withHeader(
+                    'Content-Type',
+                    'application/json'
+                );
             }
 
             //Return the Product ID in an json object

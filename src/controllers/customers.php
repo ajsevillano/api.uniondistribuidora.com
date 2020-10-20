@@ -19,29 +19,45 @@ class customers
 
     public function getID(Request $request, Response $response, $arg)
     {
-        $objetCustomerId = new customerRequest();
-        $resultQueryId = $objetCustomerId->getId($arg['id']);
-
-        //Check if the response from the DB is empty and return an error message in this case.
-        if (empty($resultQueryId)) {
+        //Validate if $arg['id'] is an int.
+        if (is_numeric($arg['id']) === false) {
             $emptyResult = json_encode(
                 [
                     'status' => 'error',
-                    'Message' =>
-                        'The item ' .
-                        $arg['id'] .
-                        ' you requested do not exist',
+                    'Message' => 'Invalid argument, the ID MUST be an number',
                 ],
                 JSON_PRETTY_PRINT
             );
             $response->getBody()->write($emptyResult);
             return $response->withHeader('Content-Type', 'application/json');
-        }
+        } else {
+            $objetCustomerId = new customerRequest();
+            $resultQueryId = $objetCustomerId->getId($arg['id']);
 
-        //Return the Customer ID in an json object
-        $encodeResult = json_encode($resultQueryId, JSON_PRETTY_PRINT);
-        $response->getBody()->write($encodeResult);
-        return $response->withHeader('Content-Type', 'application/json');
+            //Check if the response from the DB is empty and return an error message in this case.
+            if (empty($resultQueryId)) {
+                $emptyResult = json_encode(
+                    [
+                        'status' => 'error',
+                        'Message' =>
+                            'The item ' .
+                            $arg['id'] .
+                            ' you requested do not exist',
+                    ],
+                    JSON_PRETTY_PRINT
+                );
+                $response->getBody()->write($emptyResult);
+                return $response->withHeader(
+                    'Content-Type',
+                    'application/json'
+                );
+            }
+
+            //Return the Customer ID in an json object
+            $encodeResult = json_encode($resultQueryId, JSON_PRETTY_PRINT);
+            $response->getBody()->write($encodeResult);
+            return $response->withHeader('Content-Type', 'application/json');
+        }
     }
 
     public function CreateNewcustomer(

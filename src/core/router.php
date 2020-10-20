@@ -20,7 +20,7 @@ class router
     $this->app->get('/products', '\APP\controllers\products:getAll');
     $this->app->get('/products/{id}', '\APP\controllers\products:getID');
     $this->app->get('/customers', '\APP\controllers\customers:getAll');
-    $this->app->get('/customers/{id:[0-9]+}', '\APP\controllers\customers:getID');
+    $this->app->get('/customers/{id}', '\APP\controllers\customers:getID');
 
     //POST Routes
     $this->app->post('/products', '\APP\controllers\products:CreateNewProduct');
