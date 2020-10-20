@@ -29,7 +29,7 @@ class products
                 JSON_PRETTY_PRINT
             );
             $response->getBody()->write($emptyResult);
-            return $response->withHeader('Content-Type', 'application/json');
+            return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
         } else {
             //Check if the response from the DB is empty and return an error message in this case.
             $objetProductId = new productsRequest();
@@ -46,7 +46,7 @@ class products
                     JSON_PRETTY_PRINT
                 );
                 $response->getBody()->write($emptyResult);
-                return $response->withHeader(
+                return $response->withStatus(404)->withHeader(
                     'Content-Type',
                     'application/json'
                 );
