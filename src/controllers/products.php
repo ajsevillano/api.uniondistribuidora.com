@@ -19,29 +19,29 @@ class products
 
     public function getID(Request $request, Response $response, $arg)
     {
-        $objetProductId = new productsRequest();
-        $resultQueryId = $objetProductId->getId($arg['id']);
-
-        //Check if the response from the DB is empty and return an error message in this case.
-        if (empty($resultQueryId)) {
+        //Validate if $arg['id'] is an int.
+        if (is_numeric($arg['id']) === false) {
             $emptyResult = json_encode(
                 [
                     'status' => 'error',
-                    'Message' =>
-                        'The item ' .
-                        $arg['id'] .
-                        ' you requested do not exist',
+                    'Message' => 'Invalid argument, the ID MUST be an number',
                 ],
                 JSON_PRETTY_PRINT
             );
             $response->getBody()->write($emptyResult);
             return $response->withHeader('Content-Type', 'application/json');
-        }
+        } else {
+            //Check if the response from the DB is empty and return an error message in this case.
+            $objetProductId = new productsRequest();
+            $resultQueryId = $objetProductId->getId($arg['id']);
+            if (empty($resultQueryId)) {
+            }
 
-        //Return the Product ID in an json object
-        $encodeResult = json_encode($resultQueryId, JSON_PRETTY_PRINT);
-        $response->getBody()->write($encodeResult);
-        return $response->withHeader('Content-Type', 'application/json');
+            //Return the Product ID in an json object
+            $encodeResult = json_encode($resultQueryId, JSON_PRETTY_PRINT);
+            $response->getBody()->write($encodeResult);
+            return $response->withHeader('Content-Type', 'application/json');
+        }
     }
 
     public function CreateNewProduct(Request $request, Response $response, $arg)

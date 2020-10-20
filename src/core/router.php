@@ -18,7 +18,7 @@ class router
 
     //GET Routes
     $this->app->get('/products', '\APP\controllers\products:getAll');
-    $this->app->get('/products/{id:[0-9]+}', '\APP\controllers\products:getID');
+    $this->app->get('/products/{id}', '\APP\controllers\products:getID');
     $this->app->get('/customers', '\APP\controllers\customers:getAll');
     $this->app->get('/customers/{id:[0-9]+}', '\APP\controllers\customers:getID');
 
