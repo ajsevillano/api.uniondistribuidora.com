@@ -8,13 +8,35 @@ class products
 {
     public function getAll(Request $request, Response $response)
     {
-        $objetProductsList = new productsRequest();
-        $resultQueryAll = $objetProductsList->getAll();
+        $params = $request->getQueryParams();
+        $numberofArray = count($params);
+        var_dump($numberofArray);
 
-        //Return all the products in an json object
-        $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
-        $response->getBody()->write($encodeResult);
-        return $response->withHeader('Content-Type', 'application/json');
+        if ($numberofArray >= 2) {
+            var_dump('hay chicha');
+            # code...
+        }
+        else {
+            var_dump('No hay parametro');
+        }
+
+        if (!isset($params['like'])) {
+
+            $objetProductsList = new productsRequest();
+            $resultQueryAll = $objetProductsList->getAll();
+
+            //Return all the products in an json object
+            $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
+            $response->getBody()->write($encodeResult);
+            return $response->withHeader('Content-Type', 'application/json');
+
+        } else {
+            $objetProductsList = new productsRequest();
+            $resultQueryAll = $objetProductsList->getLike($params['like']);
+            $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
+            $response->getBody()->write($encodeResult);
+            return $response->withHeader('Content-Type', 'application/json');
+        }
     }
 
     public function getID(Request $request, Response $response, $arg)
@@ -29,7 +51,9 @@ class products
                 JSON_PRETTY_PRINT
             );
             $response->getBody()->write($emptyResult);
-            return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+            return $response
+                ->withStatus(400)
+                ->withHeader('Content-Type', 'application/json');
         } else {
             //Check if the response from the DB is empty and return an error message in this case.
             $objetProductId = new productsRequest();
@@ -46,10 +70,9 @@ class products
                     JSON_PRETTY_PRINT
                 );
                 $response->getBody()->write($emptyResult);
-                return $response->withStatus(404)->withHeader(
-                    'Content-Type',
-                    'application/json'
-                );
+                return $response
+                    ->withStatus(404)
+                    ->withHeader('Content-Type', 'application/json');
             }
 
             //Return the Product ID in an json object

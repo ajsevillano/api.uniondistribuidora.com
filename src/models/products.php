@@ -35,6 +35,23 @@ class products
         return $consulta->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+    public function getLike($destacado)
+    {
+        $sql = "
+        SELECT
+          id, tipo, marca, tamano, nombre, activo, destacado,last_update
+        FROM catalogo
+        WHERE destacado = :destacado
+        ORDER by id ASC, nombre ASC
+      ";
+      $dbh = new connection();
+      $pdoContent = $dbh->obtenerPDO();
+      $consulta = $pdoContent->prepare($sql);
+      $consulta->bindValue(':destacado', $destacado, \PDO::PARAM_INT);
+      $consulta->execute();
+      return $consulta->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
     public function insertNewProduct(
         $nombre,
         $tamano,
