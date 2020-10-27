@@ -9,30 +9,49 @@ class products
     public function getAll(Request $request, Response $response)
     {
         $params = $request->getQueryParams();
-        $numberofArray = count($params);
-        var_dump($numberofArray);
+        $numberOfKeys = count($params);
+        $param = array_slice($params, 1);
+        $nameOfKey = key($param);
 
-        if ($numberofArray >= 2) {
-            var_dump('hay chicha');
-            # code...
-        }
-        else {
-            var_dump('No hay parametro');
-        }
+        if ($numberOfKeys >= 2) {
+            if (
+                array_key_exists('like', $param) ||
+                array_key_exists('status', $param)
+            ) {
+                $objetProductsList = new productsRequest();
 
-        if (!isset($params['like'])) {
+                $nameOfKey == 'like'
+                    ? ($resultQueryAll = $objetProductsList->getLike(
+                        $params['like']
+                    ))
+                    : ($resultQueryAll = $objetProductsList->getStatus(
+                        $params['status']
+                    ));
 
+                $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
+                $response->getBody()->write($encodeResult);
+                return $response->withHeader(
+                    'Content-Type',
+                    'application/json'
+                );
+            } else {
+                $errorInvalidParam = json_encode(
+                    [
+                        'status' => 'error',
+                        'Message' => 'Only like or status are valid parametes',
+                    ],
+                    JSON_PRETTY_PRINT
+                );
+                $response->getBody()->write($errorInvalidParam);
+                return $response
+                    ->withStatus(400)
+                    ->withHeader('Content-Type', 'application/json');
+            }
+        } else {
             $objetProductsList = new productsRequest();
             $resultQueryAll = $objetProductsList->getAll();
 
             //Return all the products in an json object
-            $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
-            $response->getBody()->write($encodeResult);
-            return $response->withHeader('Content-Type', 'application/json');
-
-        } else {
-            $objetProductsList = new productsRequest();
-            $resultQueryAll = $objetProductsList->getLike($params['like']);
             $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
             $response->getBody()->write($encodeResult);
             return $response->withHeader('Content-Type', 'application/json');
