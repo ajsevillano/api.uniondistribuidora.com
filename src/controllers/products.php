@@ -12,9 +12,8 @@ class products
         $numberOfKeys = count($params);
         $param = array_slice($params, 1);
         $nameOfKey = key($param);
-        var_dump($nameOfKey);
-        if ($numberOfKeys !=1) {
-            if ($nameOfKey !='like'&& $nameOfKey !='status') {
+        if ($numberOfKeys != 1) {
+            if ($nameOfKey != 'like' && $nameOfKey != 'status') {
                 $errorInvalidParam = json_encode(
                     [
                         'status' => 'error',
@@ -26,23 +25,20 @@ class products
                 return $response
                     ->withStatus(400)
                     ->withHeader('Content-Type', 'application/json');
-            };
+            }
+
             $objetProductsList = new productsRequest();
+            $nameOfKey == 'like'
+                ? ($resultQueryAll = $objetProductsList->getLike(
+                    $params['like']
+                ))
+                : ($resultQueryAll = $objetProductsList->getStatus(
+                    $params['status']
+                ));
 
-                $nameOfKey == 'like'
-                    ? ($resultQueryAll = $objetProductsList->getLike(
-                        $params['like']
-                    ))
-                    : ($resultQueryAll = $objetProductsList->getStatus(
-                        $params['status']
-                    ));
-
-                $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
-                $response->getBody()->write($encodeResult);
-                return $response->withHeader(
-                    'Content-Type',
-                    'application/json'
-                );
+            $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
+            $response->getBody()->write($encodeResult);
+            return $response->withHeader('Content-Type', 'application/json');
         }
 
         $objetProductsList = new productsRequest();
@@ -52,8 +48,6 @@ class products
         $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
         $response->getBody()->write($encodeResult);
         return $response->withHeader('Content-Type', 'application/json');
-
-
     }
 
     public function getID(Request $request, Response $response, $arg)
