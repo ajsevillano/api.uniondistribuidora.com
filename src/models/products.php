@@ -35,38 +35,22 @@ class products
         return $consulta->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    public function getLike($destacado)
-    {
-        $sql = "
-        SELECT
-          id, tipo, marca, tamano, nombre, activo, destacado,last_update
-        FROM catalogo
-        WHERE destacado = :destacado
-        ORDER by id ASC, nombre ASC
-      ";
-      $dbh = new connection();
-      $pdoContent = $dbh->obtenerPDO();
-      $consulta = $pdoContent->prepare($sql);
-      $consulta->bindValue(':destacado', $destacado, \PDO::PARAM_INT);
-      $consulta->execute();
-      return $consulta->fetchAll(\PDO::FETCH_ASSOC);
-    }
-
-    public function getStatus($status)
+    
+    public function getFilter($nameOfFilter,$category)
     {
       $sql = "
-        SELECT
-          id, tipo, marca, tamano, nombre, activo, destacado,last_update
-        FROM catalogo
-        WHERE activo = :activo
-        ORDER by id ASC, nombre ASC
-      ";
-      $dbh = new connection();
-      $pdoContent = $dbh->obtenerPDO();
-      $consulta = $pdoContent->prepare($sql);
-      $consulta->bindValue(':activo', $status, \PDO::PARAM_INT);
-      $consulta->execute();
-      return $consulta->fetchAll(\PDO::FETCH_ASSOC);
+      SELECT
+        id, tipo, marca, tamano, nombre, activo, destacado,last_update
+      FROM catalogo WHERE  
+    ";
+    $sql .= $nameOfFilter . "= :filter";
+    $sql .= " ORDER by id ASC, nombre ASC";
+    $dbh = new connection();
+    $pdoContent = $dbh->obtenerPDO();
+    $consulta = $pdoContent->prepare($sql);
+    $consulta->bindValue(':filter', $category, \PDO::PARAM_STR);
+    $consulta->execute();
+    return $consulta->fetchAll(\PDO::FETCH_ASSOC); 
     }
 
     public function insertNewProduct(

@@ -12,12 +12,17 @@ class products
         $numberOfKeys = count($params);
         $param = array_slice($params, 1);
         $nameOfKey = key($param);
+        $allowedFilters = ['like', 'status', 'category'];
+
+        //Check if there is a param
         if ($numberOfKeys != 1) {
-            if ($nameOfKey != 'like' && $nameOfKey != 'status') {
+            //Check if the param is one of the allowed one in $allowedFilters;
+            if (!in_array($nameOfKey, $allowedFilters)) {
                 $errorInvalidParam = json_encode(
                     [
                         'status' => 'error',
-                        'Message' => 'Only like or status are valid parametes',
+                        'Message' =>
+                            'Only like, status & category are valid parametes',
                     ],
                     JSON_PRETTY_PRINT
                 );
@@ -27,24 +32,47 @@ class products
                     ->withHeader('Content-Type', 'application/json');
             }
 
+            //Check if the value of the param is empty
+            if (!isset($params[$nameOfKey])) { // To update for empty() when issue #21 is solved.
+                $errorInvalidParam = json_encode(
+                    [
+                        'status' => 'error',
+                        'Message' =>
+                            'The value of ' . $nameOfKey . ' can not be empty',
+                    ],
+                    JSON_PRETTY_PRINT
+                );
+                $response->getBody()->write($errorInvalidParam);
+                return $response
+                    ->withStatus(400)
+                    ->withHeader('Content-Type', 'application/json');
+            }
+
+            // if everything is ok, we request the filter info from the model.
             $objetProductsList = new productsRequest();
-            $nameOfKey == 'like'
-                ? ($resultQueryAll = $objetProductsList->getLike(
-                    $params['like']
-                ))
-                : ($resultQueryAll = $objetProductsList->getStatus(
-                    $params['status']
-                ));
+
+            // If block to match the database field names (to solve in a future)
+            if ($nameOfKey == 'like') {
+                $filterName = 'destacado';
+            } elseif ($nameOfKey == 'status') {
+                $filterName = 'activo';
+            } else {
+                $filterName = 'tipo';
+            }
+
+            $resultQueryAll = $objetProductsList->getFilter(
+                $filterName,
+                $params[$nameOfKey]
+            );
 
             $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
             $response->getBody()->write($encodeResult);
             return $response->withHeader('Content-Type', 'application/json');
         }
 
+        //Return all the products in an json object
         $objetProductsList = new productsRequest();
         $resultQueryAll = $objetProductsList->getAll();
-
-        //Return all the products in an json object
         $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
         $response->getBody()->write($encodeResult);
         return $response->withHeader('Content-Type', 'application/json');
