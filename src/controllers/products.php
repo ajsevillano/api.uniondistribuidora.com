@@ -13,6 +13,7 @@ class products
         $param = array_slice($params, 1);
         $nameOfKey = key($param);
         $allowedFilters = ['like', 'status', 'category'];
+        var_dump($params[$nameOfKey]);
 
         //Check if there is a param
         if ($numberOfKeys != 1) {
@@ -32,8 +33,9 @@ class products
                     ->withHeader('Content-Type', 'application/json');
             }
 
-            //Check if the value of the param is empty
-            if (!isset($params[$nameOfKey])) { // To update for empty() when issue #21 is solved.
+            //Check if the value of the param is empty or !=0;
+            if (empty($params[$nameOfKey]) && ($params[$nameOfKey] != '0')) { 
+                
                 $errorInvalidParam = json_encode(
                     [
                         'status' => 'error',
