@@ -10,13 +10,90 @@ class products
     {
         $params = $request->getQueryParams();
         $numberOfKeys = count($params);
-        $param = array_slice($params, 1);
-        $nameOfKey = key($param);
+        $firstParam = array_slice($params, 1);
+        $secondParam = array_slice($params, 2);
+        $nameOfKey = key($firstParam);
+        $nameOfSecondKey = key($secondParam);
         $allowedFilters = ['like', 'status', 'category'];
-        var_dump($params[$nameOfKey]);
+        $allowedSecondFilter = ['status'];
+        print_r($params[$nameOfSecondKey]);
 
-        //Check if there is a param
-        if ($numberOfKeys != 1) {
+        if ($numberOfKeys >= 4) {
+            //Check if there are more than 2 filters.
+            $errorInvalidParam = json_encode(
+                [
+                    'status' => 'error',
+                    'Message' =>
+                        'The search filter is too long, only 2 filters are allow',
+                ],
+                JSON_PRETTY_PRINT
+            );
+            $response->getBody()->write($errorInvalidParam);
+            return $response
+                ->withStatus(400)
+                ->withHeader('Content-Type', 'application/json');
+        }
+
+        if ($numberOfKeys == 3) {
+            //Check that only the right parameters are allow
+            if (
+                !in_array($nameOfKey, $allowedFilters) ||
+                !in_array($nameOfSecondKey, $allowedSecondFilter)
+            ) {
+                $errorInvalidParam = json_encode(
+                    [
+                        'status' => 'error',
+                        'Message' =>
+                            'Only like, status & category are valid first parameters and status valid second parameter',
+                    ],
+                    JSON_PRETTY_PRINT
+                );
+                $response->getBody()->write($errorInvalidParam);
+                return $response
+                    ->withStatus(400)
+                    ->withHeader('Content-Type', 'application/json');
+            }
+
+            //Check that values are not empty
+            if (
+                (empty($params[$nameOfKey]) && $params[$nameOfKey] != '0') ||
+                (empty($params[$nameOfSecondKey]) &&
+                    $params[$nameOfSecondKey] != '0')
+            ) {
+                $errorInvalidParam = json_encode(
+                    [
+                        'status' => 'error',
+                        'Message' => 'The values can not be empty',
+                    ],
+                    JSON_PRETTY_PRINT
+                );
+                $response->getBody()->write($errorInvalidParam);
+                return $response
+                    ->withStatus(400)
+                    ->withHeader('Content-Type', 'application/json');
+            }
+
+            //Check that the second parameter "status" only allow 1 or 0
+            if ($params[$nameOfSecondKey] != '1' && $params[$nameOfSecondKey] != '0' ) {
+                $errorInvalidParam = json_encode(
+                    [
+                        'status' => 'error',
+                        'Message' => 'status values can only be 0 or 1',
+                    ],
+                    JSON_PRETTY_PRINT
+                );
+                $response->getBody()->write($errorInvalidParam);
+                return $response
+                    ->withStatus(400)
+                    ->withHeader('Content-Type', 'application/json');
+            }
+
+            //Return the result
+            $response->getBody()->write('This filter is in progress');
+            return $response->withHeader('Content-Type', 'application/json');
+        }
+
+        if ($numberOfKeys == 2) {
             //Check if the param is one of the allowed one in $allowedFilters;
             if (!in_array($nameOfKey, $allowedFilters)) {
                 $errorInvalidParam = json_encode(
@@ -32,10 +109,8 @@ class products
                     ->withStatus(400)
                     ->withHeader('Content-Type', 'application/json');
             }
-
             //Check if the value of the param is empty or !=0;
-            if (empty($params[$nameOfKey]) && ($params[$nameOfKey] != '0')) { 
-                
+            if (empty($params[$nameOfKey]) && $params[$nameOfKey] != '0') {
                 $errorInvalidParam = json_encode(
                     [
                         'status' => 'error',
@@ -73,11 +148,13 @@ class products
         }
 
         //Return all the products in an json object
-        $objetProductsList = new productsRequest();
-        $resultQueryAll = $objetProductsList->getAll();
-        $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
-        $response->getBody()->write($encodeResult);
-        return $response->withHeader('Content-Type', 'application/json');
+        if ($numberOfKeys == 1) {
+            $objetProductsList = new productsRequest();
+            $resultQueryAll = $objetProductsList->getAll();
+            $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
+            $response->getBody()->write($encodeResult);
+            return $response->withHeader('Content-Type', 'application/json');
+        }
     }
 
     public function getID(Request $request, Response $response, $arg)
