@@ -36,7 +36,7 @@ class products
     }
 
     
-    public function getFilter($nameOfFilter,$category)
+    public function getFilter($nameOfFilter,$firstParam)
     {
       $sql = "
       SELECT
@@ -48,10 +48,30 @@ class products
     $dbh = new connection();
     $pdoContent = $dbh->obtenerPDO();
     $consulta = $pdoContent->prepare($sql);
-    $consulta->bindValue(':filter', $category, \PDO::PARAM_STR);
+    $consulta->bindValue(':filter', $firstParam, \PDO::PARAM_STR);
     $consulta->execute();
     return $consulta->fetchAll(\PDO::FETCH_ASSOC); 
     }
+
+    public function getFilterWithTwoParams($nameOfFilter,$firstParam,$secondParam)
+    {
+      $sql = "
+      SELECT
+        id, tipo, marca, tamano, nombre, activo, destacado,last_update
+      FROM catalogo WHERE  
+    ";
+    $sql .= $nameOfFilter . "= :filter";
+    $sql .= " && activo = :status";
+    $sql .= " ORDER by id ASC, nombre ASC";
+    $dbh = new connection();
+    $pdoContent = $dbh->obtenerPDO();
+    $consulta = $pdoContent->prepare($sql);
+    $consulta->bindValue(':filter', $firstParam, \PDO::PARAM_STR);
+    $consulta->bindValue(':status', $secondParam, \PDO::PARAM_STR);
+    $consulta->execute();
+    return $consulta->fetchAll(\PDO::FETCH_ASSOC); 
+    }
+    
 
     public function insertNewProduct(
         $nombre,

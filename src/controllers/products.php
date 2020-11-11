@@ -12,11 +12,10 @@ class products
         $numberOfKeys = count($params);
         $firstParam = array_slice($params, 1);
         $secondParam = array_slice($params, 2);
-        $nameOfKey = key($firstParam);
-        $nameOfSecondKey = key($secondParam);
+        $valueOfFirstKey = key($firstParam);
+        $valueOfSecondKey = key($secondParam);
         $allowedFilters = ['like', 'status', 'category'];
         $allowedSecondFilter = ['status'];
-        print_r($params[$nameOfSecondKey]);
 
         if ($numberOfKeys >= 4) {
             //Check if there are more than 2 filters.
@@ -37,8 +36,8 @@ class products
         if ($numberOfKeys == 3) {
             //Check that only the right parameters are allow
             if (
-                !in_array($nameOfKey, $allowedFilters) ||
-                !in_array($nameOfSecondKey, $allowedSecondFilter)
+                !in_array($valueOfFirstKey, $allowedFilters) ||
+                !in_array($valueOfSecondKey, $allowedSecondFilter)
             ) {
                 $errorInvalidParam = json_encode(
                     [
@@ -56,9 +55,9 @@ class products
 
             //Check that values are not empty
             if (
-                (empty($params[$nameOfKey]) && $params[$nameOfKey] != '0') ||
-                (empty($params[$nameOfSecondKey]) &&
-                    $params[$nameOfSecondKey] != '0')
+                (empty($params[$valueOfFirstKey]) && $params[$valueOfFirstKey] != '0') ||
+                (empty($params[$valueOfSecondKey]) &&
+                    $params[$valueOfSecondKey] != '0')
             ) {
                 $errorInvalidParam = json_encode(
                     [
@@ -74,7 +73,7 @@ class products
             }
 
             //Check that the second parameter "status" only allow 1 or 0
-            if ($params[$nameOfSecondKey] != '1' && $params[$nameOfSecondKey] != '0' ) {
+            if ($params[$valueOfSecondKey] != '1' && $params[$valueOfSecondKey] != '0' ) {
                 $errorInvalidParam = json_encode(
                     [
                         'status' => 'error',
@@ -89,13 +88,33 @@ class products
             }
 
             //Return the result
-            $response->getBody()->write('This filter is in progress');
+             $objetProductsList = new productsRequest();
+
+            // If block to match the database field names (to solve in a future)
+            if ($valueOfFirstKey == 'like') {
+                 $filterName = 'destacado';
+             } elseif ($valueOfFirstKey == 'status') {
+                 $filterName = 'activo';
+             } else {
+                 $filterName = 'tipo';
+             }
+
+            //Send the params to the model
+            $resultQueryAll = $objetProductsList->getFilterWithTwoParams(
+                $filterName,
+                $params[$valueOfFirstKey],
+                $params[$valueOfSecondKey]
+            );
+
+            $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
+            $response->getBody()->write($encodeResult);
             return $response->withHeader('Content-Type', 'application/json');
+
         }
 
         if ($numberOfKeys == 2) {
             //Check if the param is one of the allowed one in $allowedFilters;
-            if (!in_array($nameOfKey, $allowedFilters)) {
+            if (!in_array($valueOfFirstKey, $allowedFilters)) {
                 $errorInvalidParam = json_encode(
                     [
                         'status' => 'error',
@@ -110,12 +129,12 @@ class products
                     ->withHeader('Content-Type', 'application/json');
             }
             //Check if the value of the param is empty or !=0;
-            if (empty($params[$nameOfKey]) && $params[$nameOfKey] != '0') {
+            if (empty($params[$valueOfFirstKey]) && $params[$valueOfFirstKey] != '0') {
                 $errorInvalidParam = json_encode(
                     [
                         'status' => 'error',
                         'Message' =>
-                            'The value of ' . $nameOfKey . ' can not be empty',
+                            'The value of ' . $valueOfFirstKey . ' can not be empty',
                     ],
                     JSON_PRETTY_PRINT
                 );
@@ -129,9 +148,9 @@ class products
             $objetProductsList = new productsRequest();
 
             // If block to match the database field names (to solve in a future)
-            if ($nameOfKey == 'like') {
+            if ($valueOfFirstKey == 'like') {
                 $filterName = 'destacado';
-            } elseif ($nameOfKey == 'status') {
+            } elseif ($valueOfFirstKey == 'status') {
                 $filterName = 'activo';
             } else {
                 $filterName = 'tipo';
@@ -139,7 +158,7 @@ class products
 
             $resultQueryAll = $objetProductsList->getFilter(
                 $filterName,
-                $params[$nameOfKey]
+                $params[$valueOfFirstKey]
             );
 
             $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
