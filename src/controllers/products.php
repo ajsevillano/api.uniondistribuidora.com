@@ -3,6 +3,8 @@
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use APP\models\products as productsRequest;
+use APP\libs\errors as errors;
+use APP\libs\validators as validators;
 
 class products
 {
@@ -17,158 +19,108 @@ class products
         $allowedFilters = ['like', 'status', 'category'];
         $allowedSecondFilter = ['status'];
 
+        //Responses
+        $error400Response = $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+
+        //Instanciate classes
+        $objetProductsList = new productsRequest();
+        $objetValidator = new validators();
+        $objetError = new errors();
+        
+        //If there are more than 2 parameters
         if ($numberOfKeys >= 4) {
-            //Check if there are more than 2 filters.
-            $errorInvalidParam = json_encode(
-                [
-                    'status' => 'error',
-                    'Message' =>
-                        'The search filter is too long, only 2 filters are allow',
-                ],
-                JSON_PRETTY_PRINT
-            );
-            $response->getBody()->write($errorInvalidParam);
-            return $response
-                ->withStatus(400)
-                ->withHeader('Content-Type', 'application/json');
+            //Return the error in json format
+            $errorMsg ='The search filter is too long, only 2 filters are allow';
+            $resultError = $objetError->generalError($errorMsg);
+            $response->getBody()->write($resultError);
+            return $error400Response;
         }
 
+        //If there are 2 parameters
         if ($numberOfKeys == 3) {
-            //Check that only the right parameters are allow
+            //Check that only the parameters allowed in $allowedFilters and $allowedSecondFilter are found
             if (
-                !in_array($valueOfFirstKey, $allowedFilters) ||
-                !in_array($valueOfSecondKey, $allowedSecondFilter)
+                $objetValidator->CheckIfAllParamsAllowed($valueOfFirstKey,$allowedFilters,$valueOfSecondKey, $allowedSecondFilter)
             ) {
-                $errorInvalidParam = json_encode(
-                    [
-                        'status' => 'error',
-                        'Message' =>
-                            'Only like, status & category are valid first parameters and status valid second parameter',
-                    ],
-                    JSON_PRETTY_PRINT
-                );
-                $response->getBody()->write($errorInvalidParam);
-                return $response
-                    ->withStatus(400)
-                    ->withHeader('Content-Type', 'application/json');
+                $errorMsg ='Only like, status & category are valid first parameters and status valid second parameter';
+                $resultError = $objetError->generalError($errorMsg);
+                $response->getBody()->write($resultError);
+                return $error400Response;
             }
 
-            //Check that values are not empty
+           //Check values of the 2 params are not empty
             if (
-                (empty($params[$valueOfFirstKey]) && $params[$valueOfFirstKey] != '0') ||
-                (empty($params[$valueOfSecondKey]) &&
-                    $params[$valueOfSecondKey] != '0')
+                $objetValidator->CheckValuesNotEmpty($params[$valueOfFirstKey],$params[$valueOfSecondKey])
             ) {
-                $errorInvalidParam = json_encode(
-                    [
-                        'status' => 'error',
-                        'Message' => 'The values can not be empty',
-                    ],
-                    JSON_PRETTY_PRINT
-                );
-                $response->getBody()->write($errorInvalidParam);
-                return $response
-                    ->withStatus(400)
-                    ->withHeader('Content-Type', 'application/json');
+                //Return the error in json format
+                $errorMsg = 'The values can not be empty';
+                $resultError = $objetError->generalError($errorMsg);
+                $response->getBody()->write($resultError);
+                return $error400Response;
             }
 
-            //Check that the second parameter "status" only allow 1 or 0
-            if ($params[$valueOfSecondKey] != '1' && $params[$valueOfSecondKey] != '0' ) {
-                $errorInvalidParam = json_encode(
-                    [
-                        'status' => 'error',
-                        'Message' => 'status values can only be 0 or 1',
-                    ],
-                    JSON_PRETTY_PRINT
-                );
-                $response->getBody()->write($errorInvalidParam);
-                return $response
-                    ->withStatus(400)
-                    ->withHeader('Content-Type', 'application/json');
+            //Check second parameter (status) value is 0 or 1
+            if (
+                $objetValidator->CheckValueSecondParam($params[$valueOfSecondKey])
+            ) {
+                //Return the error in json format
+                $errorMsg = 'status value can only be 0 or 1';
+                $resultError = $objetError->generalError($errorMsg);
+                $response->getBody()->write($resultError);
+                return $error400Response;
             }
 
-            //Return the result
-             $objetProductsList = new productsRequest();
+            //Fix the name of the query agains the actual names in the DB.
+            $filterName = $objetError->fixRowNamesQuery($valueOfFirstKey);
 
-            // If block to match the database field names (to solve in a future)
-            if ($valueOfFirstKey == 'like') {
-                 $filterName = 'destacado';
-             } elseif ($valueOfFirstKey == 'status') {
-                 $filterName = 'activo';
-             } else {
-                 $filterName = 'tipo';
-             }
-
-            //Send the params to the model
+            //Return the filtered info from the DB.
             $resultQueryAll = $objetProductsList->getFilterWithTwoParams(
                 $filterName,
                 $params[$valueOfFirstKey],
                 $params[$valueOfSecondKey]
             );
-
             $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
             $response->getBody()->write($encodeResult);
             return $response->withHeader('Content-Type', 'application/json');
-
         }
 
+        //If there is 1 parameter
         if ($numberOfKeys == 2) {
+            
             //Check if the param is one of the allowed one in $allowedFilters;
-            if (!in_array($valueOfFirstKey, $allowedFilters)) {
-                $errorInvalidParam = json_encode(
-                    [
-                        'status' => 'error',
-                        'Message' =>
-                            'Only like, status & category are valid parametes',
-                    ],
-                    JSON_PRETTY_PRINT
-                );
-                $response->getBody()->write($errorInvalidParam);
-                return $response
-                    ->withStatus(400)
-                    ->withHeader('Content-Type', 'application/json');
+            if ($objetValidator->CheckIfFirstParamAllowed($valueOfFirstKey,$allowedFilters)) {
+                $errorMsg = 'Only like, status & category are valid parametes';
+                $resultError = $objetError->generalError($errorMsg);
+                $response->getBody()->write($resultError);
+                return $error400Response;
             }
-            //Check if the value of the param is empty or !=0;
-            if (empty($params[$valueOfFirstKey]) && $params[$valueOfFirstKey] != '0') {
-                $errorInvalidParam = json_encode(
-                    [
-                        'status' => 'error',
-                        'Message' =>
-                            'The value of ' . $valueOfFirstKey . ' can not be empty',
-                    ],
-                    JSON_PRETTY_PRINT
-                );
-                $response->getBody()->write($errorInvalidParam);
-                return $response
-                    ->withStatus(400)
-                    ->withHeader('Content-Type', 'application/json');
+            
+            if (
+                //Check if the value of the param is empty or !=0;
+                empty($params[$valueOfFirstKey]) &&
+                $params[$valueOfFirstKey] != '0'
+            ) {
+                $errorMsg ='The value of ' . $valueOfFirstKey . ' can not be empty';
+                $resultError = $objetError->generalError($errorMsg);
+                $response->getBody()->write($resultError);
+                return $error400Response;
             }
 
-            // if everything is ok, we request the filter info from the model.
-            $objetProductsList = new productsRequest();
-
-            // If block to match the database field names (to solve in a future)
-            if ($valueOfFirstKey == 'like') {
-                $filterName = 'destacado';
-            } elseif ($valueOfFirstKey == 'status') {
-                $filterName = 'activo';
-            } else {
-                $filterName = 'tipo';
-            }
+            //Fix the name of the query agains the actual names in the DB.
+            $filterName = $objetError->fixRowNamesQuery($valueOfFirstKey);
 
             $resultQueryAll = $objetProductsList->getFilter(
                 $filterName,
                 $params[$valueOfFirstKey]
             );
-
+            //Return the filtered info from the DB.
             $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
             $response->getBody()->write($encodeResult);
             return $response->withHeader('Content-Type', 'application/json');
         }
 
-        //Return all the products in an json object
+        //Return all the products in an json object (Main path, no filters)
         if ($numberOfKeys == 1) {
-            $objetProductsList = new productsRequest();
             $resultQueryAll = $objetProductsList->getAll();
             $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
             $response->getBody()->write($encodeResult);
@@ -188,9 +140,7 @@ class products
                 JSON_PRETTY_PRINT
             );
             $response->getBody()->write($emptyResult);
-            return $response
-                ->withStatus(400)
-                ->withHeader('Content-Type', 'application/json');
+            return $error400Response;
         } else {
             //Check if the response from the DB is empty and return an error message in this case.
             $objetProductId = new productsRequest();
@@ -207,9 +157,7 @@ class products
                     JSON_PRETTY_PRINT
                 );
                 $response->getBody()->write($emptyResult);
-                return $response
-                    ->withStatus(404)
-                    ->withHeader('Content-Type', 'application/json');
+                return $error400Response;
             }
 
             //Return the Product ID in an json object
@@ -235,8 +183,6 @@ class products
         $estado = htmlspecialchars($getDataFromPut->activo);
         $lastupdate = $currentDate->getTimestamp();
 
-        //Instance the model class
-        $objetProductsList = new productsRequest();
         $objetProductsList->insertNewProduct(
             $nombre,
             $tamano,
@@ -278,8 +224,6 @@ class products
         $estado = htmlspecialchars($getDataFromPut->activo);
         $lastupdate = $currentDate->getTimestamp();
 
-        //Instance the model class
-        $objetProductsList = new productsRequest();
         $objetProductsList->updateProduct(
             $Theid,
             $tipo,
