@@ -1,1 +1,1 @@
-document.querySelector('.year').innerText = new Date().getFullYear();
+document.querySelector(".year").innerText = new Date().getFullYear();

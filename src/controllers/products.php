@@ -28,9 +28,6 @@ class products
         $allowedFilters = ['like', 'status', 'category'];
         $allowedSecondFilter = ['status'];
 
-        //Responses
-        $error400Response = $response->withStatus(400)->withHeader('Content-Type', 'application/json');
-
         //Instanciate classes
         $objetProductsList = new productsRequest();
         $objetValidator = new validators();
