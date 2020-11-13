@@ -8,6 +8,15 @@ use APP\libs\validators as validators;
 
 class products
 {
+    //Errors array
+    
+    private $errorArray;
+
+    public function __construct() {
+        $this->errorArray = ['twoFiltersAllow'=>'The search filter is too long, only 2 filters are allow', 'ValidFilters'=>'Only like, status & category are valid parameters','valuesNotEmpty'=>'The values can not be empty','statusBinary'=>'status value can only be 0 or 1'];
+        
+    }
+
     public function getAll(Request $request, Response $response)
     {
         $params = $request->getQueryParams();
@@ -30,10 +39,7 @@ class products
         //If there are more than 2 parameters
         if ($numberOfKeys >= 4) {
             //Return the error in json format
-            $errorMsg ='The search filter is too long, only 2 filters are allow';
-            $resultError = $objetError->generalError($errorMsg);
-            $response->getBody()->write($resultError);
-            return $error400Response;
+            return $this->error400response($valueOfFirstKey,$response,$this->errorArray['twoFiltersAllow']);
         }
 
         //If there are 2 parameters
@@ -42,32 +48,22 @@ class products
             if (
                 $objetValidator->CheckIfAllParamsAllowed($valueOfFirstKey,$allowedFilters,$valueOfSecondKey, $allowedSecondFilter)
             ) {
-                $errorMsg ='Only like, status & category are valid first parameters and status valid second parameter';
-                $resultError = $objetError->generalError($errorMsg);
-                $response->getBody()->write($resultError);
-                return $error400Response;
+   
+                return $this->error400response($valueOfFirstKey,$response,$this->errorArray['ValidFilters']);
             }
 
-           //Check values of the 2 params are not empty
+           //Check if the values of the 2 params are empty
             if (
                 $objetValidator->CheckValuesNotEmpty($params[$valueOfFirstKey],$params[$valueOfSecondKey])
             ) {
-                //Return the error in json format
-                $errorMsg = 'The values can not be empty';
-                $resultError = $objetError->generalError($errorMsg);
-                $response->getBody()->write($resultError);
-                return $error400Response;
+                return $this->error400response($valueOfFirstKey,$response,$this->errorArray['valuesNotEmpty']);
             }
 
             //Check second parameter (status) value is 0 or 1
             if (
                 $objetValidator->CheckValueSecondParam($params[$valueOfSecondKey])
             ) {
-                //Return the error in json format
-                $errorMsg = 'status value can only be 0 or 1';
-                $resultError = $objetError->generalError($errorMsg);
-                $response->getBody()->write($resultError);
-                return $error400Response;
+                return $this->error400response($valueOfFirstKey,$response,$this->errorArray['statusBinary']);
             }
 
             //Fix the name of the query agains the actual names in the DB.
@@ -79,9 +75,7 @@ class products
                 $params[$valueOfFirstKey],
                 $params[$valueOfSecondKey]
             );
-            $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
-            $response->getBody()->write($encodeResult);
-            return $response->withHeader('Content-Type', 'application/json');
+            return $this->ValidResponse($response,$resultQueryAll);
         }
 
         //If there is 1 parameter
@@ -89,10 +83,7 @@ class products
             
             //Check if the param is one of the allowed one in $allowedFilters;
             if ($objetValidator->CheckIfFirstParamAllowed($valueOfFirstKey,$allowedFilters)) {
-                $errorMsg = 'Only like, status & category are valid parametes';
-                $resultError = $objetError->generalError($errorMsg);
-                $response->getBody()->write($resultError);
-                return $error400Response;
+                return $this->error400response($valueOfFirstKey,$response,$this->errorArray['ValidFilters']);
             }
             
             if (
@@ -101,35 +92,53 @@ class products
                 $params[$valueOfFirstKey] != '0'
             ) {
                 $errorMsg ='The value of ' . $valueOfFirstKey . ' can not be empty';
-                $resultError = $objetError->generalError($errorMsg);
-                $response->getBody()->write($resultError);
-                return $error400Response;
+                return $this->error400response($valueOfFirstKey,$response,$errorMsg);
             }
 
             //Fix the name of the query agains the actual names in the DB.
             $filterName = $objetError->fixRowNamesQuery($valueOfFirstKey);
-
             $resultQueryAll = $objetProductsList->getFilter(
-                $filterName,
-                $params[$valueOfFirstKey]
+            $filterName,
+            $params[$valueOfFirstKey]
             );
             //Return the filtered info from the DB.
-            $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
-            $response->getBody()->write($encodeResult);
-            return $response->withHeader('Content-Type', 'application/json');
+            return $this->ValidResponse($response,$resultQueryAll);
         }
 
         //Return all the products in an json object (Main path, no filters)
         if ($numberOfKeys == 1) {
             $resultQueryAll = $objetProductsList->getAll();
-            $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
-            $response->getBody()->write($encodeResult);
-            return $response->withHeader('Content-Type', 'application/json');
+            return $this->ValidResponse($response,$resultQueryAll);
         }
+        
+    }
+
+    public function ValidResponse($response,$resultQueryAll)
+    {
+        
+        $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
+        $response->getBody()->write($encodeResult);
+        return $response->withHeader('Content-Type', 'application/json');
+    }
+
+    public function error400response($valueOfFirstKey,$response,$errorMsg)
+    {
+        //Response: error
+        $error400Response = $response->withStatus(400)->withHeader('Content-Type', 'application/json');
+        $error = json_encode(
+            [
+                'status' => 'error',
+                'Message' => $errorMsg,
+            ],
+            JSON_PRETTY_PRINT
+        );
+        $response->getBody()->write($error);
+        return $error400Response;
     }
 
     public function getID(Request $request, Response $response, $arg)
     {
+        $error400Response = $response->withStatus(400)->withHeader('Content-Type', 'application/json');
         //Validate if $arg['id'] is an int.
         if (is_numeric($arg['id']) === false) {
             $emptyResult = json_encode(

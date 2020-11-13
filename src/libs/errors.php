@@ -2,19 +2,6 @@
 
 class errors
 {
-    public function generalError($errorMsg)
-    {
-        //Check if there are more than 2 filters.
-        $error = json_encode(
-            [
-                'status' => 'error',
-                'Message' => $errorMsg,
-            ],
-            JSON_PRETTY_PRINT
-        );
-
-        return $error;
-    }
 
     public function fixRowNamesQuery($valueOfFirstKey)
     {
