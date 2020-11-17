@@ -21,15 +21,17 @@ class products
                 'Only like, status & category are valid parameters',
             'valuesNotEmpty' => 'The values can not be empty',
             'statusBinary' => 'status value can only be 0 or 1',
+            'invalidArgument' => 'Invalid argument, the ID MUST be an number'
         ];
     }
 
 
     //Helper Methods//
-    public function filterThreeParams($valueOfFirstKey,$response)
+    public function filterThreeParams($response)
     {
+        $objetError = new errors();
         //Return the error in json format
-        return $this->error400response($valueOfFirstKey,$response,$this->errorArray['twoFiltersAllow']);     
+        return $objetError->error400response($response,$this->errorArray['twoFiltersAllow']);     
     }
 
     public function getAll(Request $request, Response $response)
@@ -50,7 +52,7 @@ class products
 
         //If there are more than 2 parameters
         if ($numberOfKeys >= 4) {
-            return $this->filterThreeParams($valueOfFirstKey,$response);      
+            return $this->filterThreeParams($response);      
         }
 
         //If there are 2 parameters
@@ -64,8 +66,7 @@ class products
                     $allowedSecondFilter
                 )
             ) {
-                return $this->error400response(
-                    $valueOfFirstKey,
+                return $objetError->error400response(
                     $response,
                     $this->errorArray['ValidFilters']
                 );
@@ -78,8 +79,7 @@ class products
                     $params[$valueOfSecondKey]
                 )
             ) {
-                return $this->error400response(
-                    $valueOfFirstKey,
+                return $objetError->error400response(
                     $response,
                     $this->errorArray['valuesNotEmpty']
                 );
@@ -91,8 +91,7 @@ class products
                     $params[$valueOfSecondKey]
                 )
             ) {
-                return $this->error400response(
-                    $valueOfFirstKey,
+                return $objetError->error400response(
                     $response,
                     $this->errorArray['statusBinary']
                 );
@@ -119,8 +118,7 @@ class products
                     $allowedFilters
                 )
             ) {
-                return $this->error400response(
-                    $valueOfFirstKey,
+                return $objetError->error400response(
                     $response,
                     $this->errorArray['ValidFilters']
                 );
@@ -133,7 +131,7 @@ class products
             ) {
                 $errorMsg =
                     'The value of ' . $valueOfFirstKey . ' can not be empty';
-                return $this->error400response(
+                return $objetError->error400response(
                     $valueOfFirstKey,
                     $response,
                     $errorMsg
@@ -164,39 +162,14 @@ class products
         return $response->withHeader('Content-Type', 'application/json');
     }
 
-    public function error400response($valueOfFirstKey, $response, $errorMsg)
-    {
-        //Response: error
-        $error = json_encode(
-            [
-                'status' => 'error',
-                'Message' => $errorMsg,
-            ],
-            JSON_PRETTY_PRINT
-        );
-        $response->getBody()->write($error);
-        $error400Response = $response
-        ->withStatus(400)
-        ->withHeader('Content-Type', 'application/json');
-        return $error400Response;
-    }
-
     public function getID(Request $request, Response $response, $arg)
     {
-        $error400Response = $response
-            ->withStatus(400)
-            ->withHeader('Content-Type', 'application/json');
+
         //Validate if $arg['id'] is an int.
         if (is_numeric($arg['id']) === false) {
-            $emptyResult = json_encode(
-                [
-                    'status' => 'error',
-                    'Message' => 'Invalid argument, the ID MUST be an number',
-                ],
-                JSON_PRETTY_PRINT
-            );
-            $response->getBody()->write($emptyResult);
-            return $error400Response;
+            $objetError = new errors();
+            //Return the error in json format
+            return $objetError->error400response($response,$this->errorArray['twoFiltersAllow']);     
         } else {
             //Check if the response from the DB is empty and return an error message in this case.
             $objetProductId = new productsRequest();

@@ -17,4 +17,21 @@ class errors
             return $filterName;
         }
     }
+
+    public function error400response($response, $errorMsg)
+    {
+                //Response: error
+                $error = json_encode(
+                    [
+                        'status' => 'error',
+                        'Message' => $errorMsg,
+                    ],
+                    JSON_PRETTY_PRINT
+                );
+                $response->getBody()->write($error);
+                $error400Response = $response
+                ->withStatus(400)
+                ->withHeader('Content-Type', 'application/json');
+                return $error400Response;
+    }
 }
