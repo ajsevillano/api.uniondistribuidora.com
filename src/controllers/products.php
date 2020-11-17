@@ -24,6 +24,14 @@ class products
         ];
     }
 
+
+    //Helper Methods//
+    public function filterThreeParams($valueOfFirstKey,$response)
+    {
+        //Return the error in json format
+        return $this->error400response($valueOfFirstKey,$response,$this->errorArray['twoFiltersAllow']);     
+    }
+
     public function getAll(Request $request, Response $response)
     {
         $params = $request->getQueryParams();
@@ -42,12 +50,7 @@ class products
 
         //If there are more than 2 parameters
         if ($numberOfKeys >= 4) {
-            //Return the error in json format
-            return $this->error400response(
-                $valueOfFirstKey,
-                $response,
-                $this->errorArray['twoFiltersAllow']
-            );
+            return $this->filterThreeParams($valueOfFirstKey,$response);      
         }
 
         //If there are 2 parameters
@@ -164,9 +167,6 @@ class products
     public function error400response($valueOfFirstKey, $response, $errorMsg)
     {
         //Response: error
-        $error400Response = $response
-            ->withStatus(400)
-            ->withHeader('Content-Type', 'application/json');
         $error = json_encode(
             [
                 'status' => 'error',
@@ -175,6 +175,9 @@ class products
             JSON_PRETTY_PRINT
         );
         $response->getBody()->write($error);
+        $error400Response = $response
+        ->withStatus(400)
+        ->withHeader('Content-Type', 'application/json');
         return $error400Response;
     }
 
