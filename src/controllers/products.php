@@ -108,7 +108,7 @@ class products
                 $params[$valueOfFirstKey],
                 $params[$valueOfSecondKey]
             );
-            return $this->ValidResponse($response, $resultQueryAll);
+            return $objetValidator->ValidResponse($response, $resultQueryAll);
         }
 
         //If there is 1 parameter
@@ -147,22 +147,17 @@ class products
                 $params[$valueOfFirstKey]
             );
             //Return the filtered info from the DB.
-            return $this->ValidResponse($response, $resultQueryAll);
+            return $objetValidator->ValidResponse($response, $resultQueryAll);
         }
 
         //Return all the products in an json object (Main path, no filters)
         if ($numberOfKeys == 1) {
             $resultQueryAll = $objetProductsList->getAll();
-            return $this->ValidResponse($response, $resultQueryAll);
+            return $objetValidator->ValidResponse($response, $resultQueryAll);
         }
     }
 
-    public function ValidResponse($response, $resultQueryAll)
-    {
-        $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
-        $response->getBody()->write($encodeResult);
-        return $response->withHeader('Content-Type', 'application/json');
-    }
+
 
     public function getID(Request $request, Response $response, $arg)
     {

@@ -27,4 +27,11 @@ class validators
     {
         return $secondValue != '1' && $secondValue != '0';
     }
+
+    public function ValidResponse($response, $resultQueryAll)
+    {
+        $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
+        $response->getBody()->write($encodeResult);
+        return $response->withHeader('Content-Type', 'application/json');
+    }
 }

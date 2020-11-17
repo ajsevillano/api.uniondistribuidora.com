@@ -16,8 +16,8 @@ You can download the project in [zip](https://github.com/ajsevillano/api.uniondi
 gh repo clone ajsevillano/api.uniondistribuidora.com
 ```
 
-- Download and install composer from [here](https://getcomposer.org/download/)
-- Then install all the project's dependencies:
+-  Download and install composer from [here](https://getcomposer.org/download/)
+-  Then install all the project's dependencies:
 
 ```bash
 php composer.phar update
