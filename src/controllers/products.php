@@ -21,17 +21,19 @@ class products
                 'Only like, status & category are valid parameters',
             'valuesNotEmpty' => 'The values can not be empty',
             'statusBinary' => 'status value can only be 0 or 1',
-            'invalidArgument' => 'Invalid argument, the ID MUST be an number'
+            'invalidArgument' => 'Invalid argument, the ID MUST be an number',
         ];
     }
-
 
     //Helper Methods//
     public function filterThreeParams($response)
     {
         $objetError = new errors();
         //Return the error in json format
-        return $objetError->error400response($response,$this->errorArray['twoFiltersAllow']);     
+        return $objetError->error400response(
+            $response,
+            $this->errorArray['twoFiltersAllow']
+        );
     }
 
     public function getAll(Request $request, Response $response)
@@ -52,7 +54,7 @@ class products
 
         //If there are more than 2 parameters
         if ($numberOfKeys >= 4) {
-            return $this->filterThreeParams($response);      
+            return $this->filterThreeParams($response);
         }
 
         //If there are 2 parameters
@@ -164,12 +166,14 @@ class products
 
     public function getID(Request $request, Response $response, $arg)
     {
-
         //Validate if $arg['id'] is an int.
         if (is_numeric($arg['id']) === false) {
             $objetError = new errors();
             //Return the error in json format
-            return $objetError->error400response($response,$this->errorArray['twoFiltersAllow']);     
+            return $objetError->error400response(
+                $response,
+                $this->errorArray['twoFiltersAllow']
+            );
         } else {
             //Check if the response from the DB is empty and return an error message in this case.
             $objetProductId = new productsRequest();
