@@ -22,6 +22,7 @@ class products
             'valuesNotEmpty' => 'The values can not be empty',
             'statusBinary' => 'status value can only be 0 or 1',
             'invalidArgument' => 'Invalid argument, the ID MUST be an number',
+            'itemDoesntExist' => 'The item you requested do not exist',
         ];
     }
 
@@ -161,38 +162,30 @@ class products
 
     public function getID(Request $request, Response $response, $arg)
     {
+        $objetError = new errors();
         //Validate if $arg['id'] is an int.
         if (is_numeric($arg['id']) === false) {
-            $objetError = new errors();
+            
             //Return the error in json format
             return $objetError->error400response(
                 $response,
-                $this->errorArray['twoFiltersAllow']
+                $this->errorArray['invalidArgument']
             );
-        } else {
+        } 
             //Check if the response from the DB is empty and return an error message in this case.
             $objetProductId = new productsRequest();
             $resultQueryId = $objetProductId->getId($arg['id']);
             if (empty($resultQueryId)) {
-                $emptyResult = json_encode(
-                    [
-                        'status' => 'error',
-                        'Message' =>
-                            'The item ' .
-                            $arg['id'] .
-                            ' you requested do not exist',
-                    ],
-                    JSON_PRETTY_PRINT
+                return $objetError->error400response(
+                    $response,
+                    $this->errorArray['itemDoesntExist']
                 );
-                $response->getBody()->write($emptyResult);
-                return $error400Response;
             }
 
             //Return the Product ID in an json object
             $encodeResult = json_encode($resultQueryId, JSON_PRETTY_PRINT);
             $response->getBody()->write($encodeResult);
             return $response->withHeader('Content-Type', 'application/json');
-        }
     }
 
     public function CreateNewProduct(Request $request, Response $response, $arg)
