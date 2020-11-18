@@ -190,6 +190,9 @@ class products
 
     public function CreateNewProduct(Request $request, Response $response, $arg)
     {
+        //Instanciate classes
+        $objetProductsList = new productsRequest();
+
         //Get the date in timestamp format
         $currentDate = new \DateTime();
 
@@ -230,6 +233,8 @@ class products
 
     public function UpdateProduct(Request $request, Response $response, $arg)
     {
+        //Instanciate classes
+        $objetProductsList = new productsRequest();
         //Get the date in timestamp format
         $currentDate = new \DateTime();
 
