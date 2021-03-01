@@ -265,6 +265,7 @@ class products
             [
                 'status' => 'ok',
                 'Message' => 'The product ' . $Theid . ' has been updated',
+                'Time' => $lastupdate,
             ],
             JSON_PRETTY_PRINT
         );
