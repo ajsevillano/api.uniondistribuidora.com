@@ -8,8 +8,11 @@ class router
   private $app;
   public function loadApp()
   {
+
     //Get the slim objet
+  
     $this->app = AppFactory::create();
+    
     //Return a more readable error.
     $this->app->addErrorMiddleware(true, true, true);
 
@@ -25,6 +28,7 @@ class router
     //POST Routes
     $this->app->post('/products', '\APP\controllers\products:CreateNewProduct');
     $this->app->post('/customers', '\APP\controllers\customers:CreateNewCustomer');
+    $this->app->post('/img', '\APP\controllers\uploadImage:getImage');
 
     //PUT Routes
     $this->app->put('/products', '\APP\controllers\products:UpdateProduct');
