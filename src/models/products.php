@@ -99,6 +99,8 @@ class products
         $consulta->bindValue(':destacado', 0, \PDO::PARAM_INT);
         $consulta->bindValue(':lastupdate', $lastupdate, \PDO::PARAM_INT);
         $consulta->execute();
+        $id = $pdoContent->lastInsertId();
+        return $id;
     }
 
     public function updateProduct(

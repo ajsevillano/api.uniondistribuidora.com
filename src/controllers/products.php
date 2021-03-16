@@ -207,7 +207,7 @@ class products
         $estado = htmlspecialchars($getDataFromPut->activo);
         $lastupdate = $currentDate->getTimestamp();
 
-        $objetProductsList->insertNewProduct(
+        $lastId = $objetProductsList->insertNewProduct(
             $nombre,
             $tamano,
             $marca,
@@ -216,13 +216,15 @@ class products
             $lastupdate
         );
 
+
         //Return a json objet confirming the product has been added to the db
         $encodeMsg = json_encode(
             [
                 'status' => 'ok',
+                'lastID' => $lastId,
                 'Message' =>
                     'The product ' .
-                    $nombre .
+                    $nombre . 'Last id inserted:' . 
                     ' has been added to the data base',
             ],
             JSON_PRETTY_PRINT
