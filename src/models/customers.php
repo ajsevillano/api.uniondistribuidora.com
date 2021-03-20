@@ -21,11 +21,10 @@ class customers
     public function getId($theId)
     {
         $sql = "
-		  SELECT
-		    id, tipo, marca, nombre, activo, destacado,last_update
-		  FROM bares
-		  WHERE id = :id
-		  ORDER by id ASC, nombre ASC
+        SELECT 
+          bares.id,bares.tipo,bares.marca,bares.nombre,bares.activo,bares.destacado,bares.last_update,bares_data.tapa,bares_data.direccion,bares_data.telefono,bares_data.info FROM bares,bares_data
+        WHERE bares.id = bares_data.id 
+        AND bares.id = :id
 		";
         $dbh = new connection();
         $pdoContent = $dbh->obtenerPDO();
