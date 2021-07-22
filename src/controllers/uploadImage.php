@@ -11,7 +11,7 @@ class uploadImage
 
 public function getImage (Request $request, Response $response) {
  
-  $directory =  __DIR__ . '/../../../management-app/img/Thumbnails';
+  $directory =  __DIR__ . '/../../../imgdata/uniondistribuidora/img/Thumbnails';
   print_r($directory);
   $uploadedFiles = $request->getUploadedFiles();
 
