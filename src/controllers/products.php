@@ -5,7 +5,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use APP\models\products as productsRequest;
 use APP\libs\errors as errors;
 use APP\libs\validators as validators;
-use APP\libs\helpers as helpers;
+
 
 class products
 {
@@ -13,12 +13,14 @@ class products
     private $objetProductsList;
     private $objetValidator;
     private $objetError;
-    private $objectHelper;
+
 
     public function __construct()
     {
         //Errors array
         $this->errorArray = [
+            'twoFiltersAllow' =>
+            'Only 2 filters are allowed',
             'ValidFilters' =>
                 'Only like, status & category are valid parameters',
             'valuesNotEmpty' => 'The values can not be empty',
@@ -31,7 +33,7 @@ class products
         $this->objetProductsList = new productsRequest();
         $this->objetValidator = new validators();
         $this->objetError = new errors();
-        $this->objectHelper = new helpers();
+
     }
 
 
@@ -50,7 +52,11 @@ class products
     
         //If there are more than 2 parameters
         if ($numberOfKeys >= 4) {
-            return $this->objectHelper->filterThreeParams($response,$this->objetError);
+             //Return the error in json format
+             return $this->objetError->error400response(
+            $response,
+            $this->errorArray['twoFiltersAllow']
+        );
         }
 
         //If there are 2 parameters
