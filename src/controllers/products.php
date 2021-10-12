@@ -58,7 +58,7 @@ class products
         if ($numberOfKeys == 3) {
             //Check that only the parameters allowed in $allowedFilters and $allowedSecondFilter are found
             if (
-                $this->objetValidator->CheckIfAllParamsAllowed(
+                $this->objetValidator->validateAllowedParams(
                     $valueOfFirstKey,
                     $allowedFilters,
                     $valueOfSecondKey,
@@ -73,7 +73,7 @@ class products
 
             //Check if the values of the 2 params are empty
             if (
-                $this->objetValidator->CheckValuesNotEmpty(
+                $this->objetValidator->validateNoEmptyParams(
                     $params[$valueOfFirstKey],
                     $params[$valueOfSecondKey]
                 )
@@ -86,7 +86,7 @@ class products
 
             //Check second parameter (status) value is 0 or 1
             if (
-                $this->objetValidator->CheckValueSecondParam(
+                $this->objetValidator->validateSecondParam(
                     $params[$valueOfSecondKey]
                 )
             ) {
