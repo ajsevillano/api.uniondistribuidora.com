@@ -52,8 +52,8 @@ class products
     
         //If there are more than 2 parameters
         if ($numberOfKeys >= 4) {
-             //Return the error in json format
-             return $this->objetError->error400response(
+            //Return the error in json format
+            return $this->objetError->error400response(
             $response,
             $this->errorArray['twoFiltersAllow']
         );
@@ -101,7 +101,7 @@ class products
                 );
             }
 
-            //Fix the name of the query agains the actual names in the DB.
+            //Fix the name of the query against the actual names in the DB.
             $filterName = $this->objetError->fixRowNamesQuery($valueOfFirstKey);
 
             //Return the filtered info from the DB.
