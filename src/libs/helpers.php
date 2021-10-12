@@ -11,7 +11,7 @@ class helpers
    {
        $this->errorArray = [
            'twoFiltersAllow' =>
-               ' is too long, only 2 filters are allow',
+               'Is too long, only 2 filters are allow',
            'ValidFilters' =>
                'Only like, status & category are valid parameters',
            'valuesNotEmpty' => 'The values can not be empty',

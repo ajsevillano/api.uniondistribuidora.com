@@ -12,12 +12,14 @@ class products
     //Errors array
 
     private $errorArray;
+    private $objetProductsList;
+    private $objetValidator;
+    private $objetError;
+    private $objectHelper;
 
     public function __construct()
     {
         $this->errorArray = [
-            'twoFiltersAllow' =>
-                ' is too long, only 2 filters are allow',
             'ValidFilters' =>
                 'Only like, status & category are valid parameters',
             'valuesNotEmpty' => 'The values can not be empty',
@@ -25,6 +27,12 @@ class products
             'invalidArgument' => 'Invalid argument, the ID MUST be an number',
             'itemDoesntExist' => 'The item you requested do not exist',
         ];
+
+        //Instanciate imported classes
+        $this->objetProductsList = new productsRequest();
+        $this->objetValidator = new validators();
+        $this->objetError = new errors();
+        $this->objectHelper = new helpers();
     }
 
 
@@ -40,29 +48,24 @@ class products
         $allowedFilters = ['like', 'status', 'category'];
         $allowedSecondFilter = ['status'];
 
-        //Instanciate classes
-        $objetProductsList = new productsRequest();
-        $objetValidator = new validators();
-        $objetError = new errors();
-        $objectHelper = new helpers();
-
+    
         //If there are more than 2 parameters
         if ($numberOfKeys >= 4) {
-            return $objectHelper->filterThreeParams($response,$objetError);
+            return $this->objectHelper->filterThreeParams($response,$this->objetError);
         }
 
         //If there are 2 parameters
         if ($numberOfKeys == 3) {
             //Check that only the parameters allowed in $allowedFilters and $allowedSecondFilter are found
             if (
-                $objetValidator->CheckIfAllParamsAllowed(
+                $this->objetValidator->CheckIfAllParamsAllowed(
                     $valueOfFirstKey,
                     $allowedFilters,
                     $valueOfSecondKey,
                     $allowedSecondFilter
                 )
             ) {
-                return $objetError->error400response(
+                return $this->objetError->error400response(
                     $response,
                     $this->errorArray['ValidFilters']
                 );
@@ -70,12 +73,12 @@ class products
 
             //Check if the values of the 2 params are empty
             if (
-                $objetValidator->CheckValuesNotEmpty(
+                $this->objetValidator->CheckValuesNotEmpty(
                     $params[$valueOfFirstKey],
                     $params[$valueOfSecondKey]
                 )
             ) {
-                return $objetError->error400response(
+                return $this->objetError->error400response(
                     $response,
                     $this->errorArray['valuesNotEmpty']
                 );
@@ -83,38 +86,38 @@ class products
 
             //Check second parameter (status) value is 0 or 1
             if (
-                $objetValidator->CheckValueSecondParam(
+                $this->objetValidator->CheckValueSecondParam(
                     $params[$valueOfSecondKey]
                 )
             ) {
-                return $objetError->error400response(
+                return $this->objetError->error400response(
                     $response,
                     $this->errorArray['statusBinary']
                 );
             }
 
             //Fix the name of the query agains the actual names in the DB.
-            $filterName = $objetError->fixRowNamesQuery($valueOfFirstKey);
+            $filterName = $this->objetError->fixRowNamesQuery($valueOfFirstKey);
 
             //Return the filtered info from the DB.
-            $resultQueryAll = $objetProductsList->getFilterWithTwoParams(
+            $resultQueryAll = $this->objetProductsList->getFilterWithTwoParams(
                 $filterName,
                 $params[$valueOfFirstKey],
                 $params[$valueOfSecondKey]
             );
-            return $objetValidator->ValidResponse($response, $resultQueryAll);
+            return $this->objetValidator->ValidResponse($response, $resultQueryAll);
         }
 
         //If there is 1 parameter
         if ($numberOfKeys == 2) {
             //Check if the param is one of the allowed one in $allowedFilters;
             if (
-                $objetValidator->CheckIfFirstParamAllowed(
+                $this->objetValidator->CheckIfFirstParamAllowed(
                     $valueOfFirstKey,
                     $allowedFilters
                 )
             ) {
-                return $objetError->error400response(
+                return $this->objetError->error400response(
                     $response,
                     $this->errorArray['ValidFilters']
                 );
@@ -127,7 +130,7 @@ class products
             ) {
                 $errorMsg =
                     'The value of ' . $valueOfFirstKey . ' can not be empty';
-                return $objetError->error400response(
+                return $this->objetError->error400response(
                     $valueOfFirstKey,
                     $response,
                     $errorMsg
@@ -135,19 +138,19 @@ class products
             }
 
             //Fix the name of the query agains the actual names in the DB.
-            $filterName = $objetError->fixRowNamesQuery($valueOfFirstKey);
-            $resultQueryAll = $objetProductsList->getFilter(
+            $filterName = $this->objetError->fixRowNamesQuery($valueOfFirstKey);
+            $resultQueryAll = $this->objetProductsList->getFilter(
                 $filterName,
                 $params[$valueOfFirstKey]
             );
             //Return the filtered info from the DB.
-            return $objetValidator->ValidResponse($response, $resultQueryAll);
+            return $this->objetValidator->ValidResponse($response, $resultQueryAll);
         }
 
         //Return all the products in an json object (Main path, no filters)
         if ($numberOfKeys == 1) {
-            $resultQueryAll = $objetProductsList->getAll();
-            return $objetValidator->ValidResponse($response, $resultQueryAll);
+            $resultQueryAll = $this->objetProductsList->getAll();
+            return $this->objetValidator->ValidResponse($response, $resultQueryAll);
         }
     }
 
@@ -155,12 +158,12 @@ class products
 
     public function getID(Request $request, Response $response, $arg)
     {
-        $objetError = new errors();
+     
         //Validate if $arg['id'] is an int.
         if (is_numeric($arg['id']) === false) {
             
             //Return the error in json format
-            return $objetError->error400response(
+            return $this->objetError->error400response(
                 $response,
                 $this->errorArray['invalidArgument']
             );
@@ -169,7 +172,7 @@ class products
             $objetProductId = new productsRequest();
             $resultQueryId = $objetProductId->getId($arg['id']);
             if (empty($resultQueryId)) {
-                return $objetError->error400response(
+                return $this->objetError->error400response(
                     $response,
                     $this->errorArray['itemDoesntExist']
                 );
@@ -183,8 +186,7 @@ class products
 
     public function CreateNewProduct(Request $request, Response $response, $arg)
     {
-        //Instanciate classes
-        $objetProductsList = new productsRequest();
+     
 
         //Get the date in timestamp format
         $currentDate = new \DateTime();
@@ -200,7 +202,7 @@ class products
         $estado = htmlspecialchars($getDataFromPut->activo);
         $lastupdate = $currentDate->getTimestamp();
 
-        $lastId = $objetProductsList->insertNewProduct(
+        $lastId = $this->objetProductsList->insertNewProduct(
             $nombre,
             $tamano,
             $marca,
@@ -228,8 +230,7 @@ class products
 
     public function UpdateProduct(Request $request, Response $response, $arg)
     {
-        //Instanciate classes
-        $objetProductsList = new productsRequest();
+      
         //Get the date in timestamp format
         $currentDate = new \DateTime();
 
@@ -245,7 +246,7 @@ class products
         $estado = htmlspecialchars($getDataFromPut->activo);
         $lastupdate = $currentDate->getTimestamp();
 
-        $objetProductsList->updateProduct(
+        $this->objetProductsList->updateProduct(
             $Theid,
             $tipo,
             $nombre,
