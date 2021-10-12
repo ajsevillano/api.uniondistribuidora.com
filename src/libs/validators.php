@@ -2,10 +2,6 @@
 
 class validators
 {
-    public function CheckIfFirstParamAllowed($valueOfFirstKey, $allowedFilters)
-    {
-        return !in_array($valueOfFirstKey, $allowedFilters);
-    }
 
     public function validateAllowedParams(
         $valueOfFirstKey,
@@ -13,8 +9,13 @@ class validators
         $valueOfSecondKey,
         $allowedSecondFilter
     ) {
-        return !in_array($valueOfFirstKey, $allowedFilters) ||
+
+        if (!$valueOfSecondKey) {
+            return !in_array($valueOfFirstKey, $allowedFilters);
+        } else {
+            return !in_array($valueOfFirstKey, $allowedFilters) ||
             !in_array($valueOfSecondKey, $allowedSecondFilter);
+        }
     }
 
     public function validateNoEmptyParams($firstValue, $secondValue)

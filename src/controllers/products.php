@@ -9,8 +9,6 @@ use APP\libs\helpers as helpers;
 
 class products
 {
-    //Errors array
-
     private $errorArray;
     private $objetProductsList;
     private $objetValidator;
@@ -19,6 +17,7 @@ class products
 
     public function __construct()
     {
+        //Errors array
         $this->errorArray = [
             'ValidFilters' =>
                 'Only like, status & category are valid parameters',
@@ -112,9 +111,11 @@ class products
         if ($numberOfKeys == 2) {
             //Check if the param is one of the allowed one in $allowedFilters;
             if (
-                $this->objetValidator->CheckIfFirstParamAllowed(
+                $this->objetValidator->validateAllowedParams(
                     $valueOfFirstKey,
-                    $allowedFilters
+                    $allowedFilters,
+                    $valueOfSecondKey=null,
+                    $allowedSecondFilter=null
                 )
             ) {
                 return $this->objetError->error400response(
