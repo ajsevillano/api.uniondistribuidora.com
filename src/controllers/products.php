@@ -5,6 +5,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use APP\models\products as productsRequest;
 use APP\libs\errors as errors;
 use APP\libs\validators as validators;
+use APP\libs\helpers as helpers;
 
 class products
 {
@@ -16,7 +17,7 @@ class products
     {
         $this->errorArray = [
             'twoFiltersAllow' =>
-                'The search filter is too long, only 2 filters are allow',
+                ' is too long, only 2 filters are allow',
             'ValidFilters' =>
                 'Only like, status & category are valid parameters',
             'valuesNotEmpty' => 'The values can not be empty',
@@ -26,16 +27,7 @@ class products
         ];
     }
 
-    //Helper Methods//
-    public function filterThreeParams($response)
-    {
-        $objetError = new errors();
-        //Return the error in json format
-        return $objetError->error400response(
-            $response,
-            $this->errorArray['twoFiltersAllow']
-        );
-    }
+
 
     public function getAll(Request $request, Response $response)
     {
@@ -52,10 +44,11 @@ class products
         $objetProductsList = new productsRequest();
         $objetValidator = new validators();
         $objetError = new errors();
+        $objectHelper = new helpers();
 
         //If there are more than 2 parameters
         if ($numberOfKeys >= 4) {
-            return $this->filterThreeParams($response);
+            return $objectHelper->filterThreeParams($response,$objetError);
         }
 
         //If there are 2 parameters
