@@ -7,7 +7,6 @@ use APP\libs\errors as errors;
 use APP\libs\validators as validators;
 use APP\libs\checkParams as checkParams;
 
-
 class products
 {
     private $errorArray;
@@ -15,13 +14,11 @@ class products
     private $objetValidator;
     private $objetError;
 
-
     public function __construct()
     {
         //Errors array
         $this->errorArray = [
-            'twoFiltersAllow' =>
-            'Only 2 filters are allowed',
+            'twoFiltersAllow' => 'Only 2 filters are allowed',
             'ValidFilters' =>
                 'Only like, status & category are valid parameters',
             'valuesNotEmpty' => 'The values can not be empty',
@@ -35,10 +32,7 @@ class products
         $this->objetValidator = new validators();
         $this->objetError = new errors();
         $this->objectCheckParams = new checkParams();
-
     }
-
-
 
     public function getAll(Request $request, Response $response)
     {
@@ -51,52 +45,58 @@ class products
         $allowedFilters = ['like', 'status', 'category'];
         $allowedSecondFilter = ['status'];
 
-    
         //Return all the products in an json object (Main path, no filters)
         if ($numberOfKeys == 1) {
             $resultQueryAll = $this->objetProductsList->getAll();
-            return $this->objetValidator->ValidResponse($response, $resultQueryAll);
+            return $this->objetValidator->ValidResponse(
+                $response,
+                $resultQueryAll
+            );
         }
         //Check the number of params and their filters.
         else {
-        return $this->objectCheckParams->paramsValidator($numberOfKeys,$response,$this->errorArray,$valueOfFirstKey,$allowedFilters,$valueOfSecondKey,$allowedSecondFilter,$params);
+            return $this->objectCheckParams->paramsValidator(
+                $this->objetProductsList,
+                $numberOfKeys,
+                $response,
+                $this->errorArray,
+                $valueOfFirstKey,
+                $allowedFilters,
+                $valueOfSecondKey,
+                $allowedSecondFilter,
+                $params
+            );
         }
     }
 
-
-
     public function getID(Request $request, Response $response, $arg)
     {
-     
         //Validate if $arg['id'] is an int.
         if (is_numeric($arg['id']) === false) {
-            
             //Return the error in json format
             return $this->objetError->error400response(
                 $response,
                 $this->errorArray['invalidArgument']
             );
-        } 
-            //Check if the response from the DB is empty and return an error message in this case.
-            $objetProductId = new productsRequest();
-            $resultQueryId = $objetProductId->getId($arg['id']);
-            if (empty($resultQueryId)) {
-                return $this->objetError->error400response(
-                    $response,
-                    $this->errorArray['itemDoesntExist']
-                );
-            }
+        }
+        //Check if the response from the DB is empty and return an error message in this case.
+        $objetProductId = new productsRequest();
+        $resultQueryId = $objetProductId->getId($arg['id']);
+        if (empty($resultQueryId)) {
+            return $this->objetError->error400response(
+                $response,
+                $this->errorArray['itemDoesntExist']
+            );
+        }
 
-            //Return the Product ID in an json object
-            $encodeResult = json_encode($resultQueryId, JSON_PRETTY_PRINT);
-            $response->getBody()->write($encodeResult);
-            return $response->withHeader('Content-Type', 'application/json');
+        //Return the Product ID in an json object
+        $encodeResult = json_encode($resultQueryId, JSON_PRETTY_PRINT);
+        $response->getBody()->write($encodeResult);
+        return $response->withHeader('Content-Type', 'application/json');
     }
 
     public function CreateNewProduct(Request $request, Response $response, $arg)
     {
-     
-
         //Get the date in timestamp format
         $currentDate = new \DateTime();
 
@@ -120,7 +120,6 @@ class products
             $lastupdate
         );
 
-
         //Return a json objet confirming the product has been added to the db
         $encodeMsg = json_encode(
             [
@@ -128,7 +127,8 @@ class products
                 'lastID' => $lastId,
                 'Message' =>
                     'The product ' .
-                    $nombre . 'Last id inserted:' . 
+                    $nombre .
+                    'Last id inserted:' .
                     ' has been added to the data base',
             ],
             JSON_PRETTY_PRINT
@@ -139,7 +139,6 @@ class products
 
     public function UpdateProduct(Request $request, Response $response, $arg)
     {
-      
         //Get the date in timestamp format
         $currentDate = new \DateTime();
 
