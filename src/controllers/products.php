@@ -5,6 +5,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use APP\models\products as productsRequest;
 use APP\libs\errors as errors;
 use APP\libs\validators as validators;
+use APP\libs\checkParams as checkParams;
 
 
 class products
@@ -33,6 +34,7 @@ class products
         $this->objetProductsList = new productsRequest();
         $this->objetValidator = new validators();
         $this->objetError = new errors();
+        $this->objectCheckParams = new checkParams();
 
     }
 
@@ -50,114 +52,14 @@ class products
         $allowedSecondFilter = ['status'];
 
     
-        //If there are more than 2 parameters
-        if ($numberOfKeys >= 4) {
-            //Return the error in json format
-            return $this->objetError->error400response(
-            $response,
-            $this->errorArray['twoFiltersAllow']
-        );
-        }
-
-        //If there are 2 parameters
-        if ($numberOfKeys == 3) {
-            //Check that only the parameters allowed in $allowedFilters and $allowedSecondFilter are found
-            if (
-                $this->objetValidator->validateAllowedParams(
-                    $valueOfFirstKey,
-                    $allowedFilters,
-                    $valueOfSecondKey,
-                    $allowedSecondFilter
-                )
-            ) {
-                return $this->objetError->error400response(
-                    $response,
-                    $this->errorArray['ValidFilters']
-                );
-            }
-
-            //Check if the values of the 2 params are empty
-            if (
-                $this->objetValidator->validateNoEmptyParams(
-                    $params[$valueOfFirstKey],
-                    $params[$valueOfSecondKey]
-                )
-            ) {
-                return $this->objetError->error400response(
-                    $response,
-                    $this->errorArray['valuesNotEmpty']
-                );
-            }
-
-            //Check second parameter (status) value is 0 or 1
-            if (
-                $this->objetValidator->validateSecondParam(
-                    $params[$valueOfSecondKey]
-                )
-            ) {
-                return $this->objetError->error400response(
-                    $response,
-                    $this->errorArray['statusBinary']
-                );
-            }
-
-            //Fix the name of the query against the actual names in the DB.
-            $filterName = $this->objetError->fixRowNamesQuery($valueOfFirstKey);
-
-            //Return the filtered info from the DB.
-            $resultQueryAll = $this->objetProductsList->getFilterWithTwoParams(
-                $filterName,
-                $params[$valueOfFirstKey],
-                $params[$valueOfSecondKey]
-            );
-            return $this->objetValidator->ValidResponse($response, $resultQueryAll);
-        }
-
-        //If there is 1 parameter
-        if ($numberOfKeys == 2) {
-            //Check if the param is one of the allowed one in $allowedFilters;
-            if (
-                $this->objetValidator->validateAllowedParams(
-                    $valueOfFirstKey,
-                    $allowedFilters,
-                    $valueOfSecondKey=null,
-                    $allowedSecondFilter=null
-                )
-            ) {
-                return $this->objetError->error400response(
-                    $response,
-                    $this->errorArray['ValidFilters']
-                );
-            }
-
-            if (
-                //Check if the value of the param is empty or !=0;
-                empty($params[$valueOfFirstKey]) &&
-                $params[$valueOfFirstKey] != '0'
-            ) {
-                $errorMsg =
-                    'The value of ' . $valueOfFirstKey . ' can not be empty';
-                return $this->objetError->error400response(
-                    $valueOfFirstKey,
-                    $response,
-                    $errorMsg
-                );
-            }
-
-            //Fix the name of the query agains the actual names in the DB.
-            $filterName = $this->objetError->fixRowNamesQuery($valueOfFirstKey);
-            $resultQueryAll = $this->objetProductsList->getFilter(
-                $filterName,
-                $params[$valueOfFirstKey]
-            );
-            //Return the filtered info from the DB.
-            return $this->objetValidator->ValidResponse($response, $resultQueryAll);
-        }
-
         //Return all the products in an json object (Main path, no filters)
         if ($numberOfKeys == 1) {
             $resultQueryAll = $this->objetProductsList->getAll();
             return $this->objetValidator->ValidResponse($response, $resultQueryAll);
+        }
+        //Check the number of params and their filters.
+        else {
+        return $this->objectCheckParams->paramsValidator($numberOfKeys,$response,$this->errorArray,$valueOfFirstKey,$allowedFilters,$valueOfSecondKey,$allowedSecondFilter,$params);
         }
     }
 
