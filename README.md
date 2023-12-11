@@ -2,8 +2,8 @@
 
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/f6fe2d1c42334960bcc3bf7c3b0ccea8)](https://www.codacy.com/gh/ajsevillano/api.uniondistribuidora.com/dashboard?utm_source=github.com&utm_medium=referral&utm_content=ajsevillano/api.uniondistribuidora.com&utm_campaign=Badge_Grade)
 
-[!IMPORTANT]
-This API has been deprecated in favor of a [new node API](https://github.com/ajsevillano/Api-union-distribuidora-v2). There will be no further enhancements or modifications to this deprecated API.
+>[!IMPORTANT]
+>This API has been deprecated in favor of a [new node API](https://github.com/ajsevillano/Api-union-distribuidora-v2). There will be no further enhancements or modifications to this deprecated API.
 
 This is a basic RESTful API designed for a customer.The API will allow you to fech information from a products and customers table in the databes and allow you to read,create and update them. Delete request is not allow at this time.
 
