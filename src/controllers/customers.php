@@ -3,62 +3,63 @@
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use APP\models\customers as customerRequest;
+use APP\libs\errors as errors;
+use APP\libs\validators as validators;
+use APP\libs\checkParams as checkParams;
 
 class customers
 {
     public function getAll(Request $request, Response $response)
-    {
-        $objetCustomersList = new customerRequest();
+{
+    // Initialize necessary objects
+    $objetValidator = new validators();
+    $objetError = new errors();
+    $objectCheckParams = new checkParams();
+    $objetCustomersList = new customerRequest();
+
+    // Error messages array
+    $errorArray = [
+        'twoFiltersAllow' => 'Only 2 filters are allowed',
+        'ValidFilters' =>
+            'Only like, status & category are valid parameters',
+        'valuesNotEmpty' => 'The values can not be empty',
+        'statusBinary' => 'status value can only be 0 or 1',
+        'invalidArgument' => 'Invalid argument, the ID MUST be an number',
+        'itemDoesntExist' => 'The item you requested do not exist',
+    ];
+
+    $params = $request->getQueryParams();
+    $numberOfKeys = count($params);
+    $firstParam = array_slice($params, 1);
+    $secondParam = array_slice($params, 2);
+    $valueOfFirstKey = key($firstParam);
+    $valueOfSecondKey = key($secondParam);
+    $allowedFilters = ['like', 'status', 'category'];
+    $allowedSecondFilter = ['status'];
+
+    //Return all the customers in an json object (Main path, no filters)
+    if ($numberOfKeys == 1) {
         $resultQueryAll = $objetCustomersList->getAll();
-
-        //Return all the customers in an json object
-        $encodeResult = json_encode($resultQueryAll, JSON_PRETTY_PRINT);
-        $response->getBody()->write($encodeResult);
-        return $response->withHeader('Content-Type', 'application/json');
+        return $objetValidator->ValidResponse(
+            $response,
+            $resultQueryAll
+        );
     }
-
-    public function getID(Request $request, Response $response, $arg)
-    {
-        //Validate if $arg['id'] is an int.
-        if (is_numeric($arg['id']) === false) {
-            $emptyResult = json_encode(
-                [
-                    'status' => 'error',
-                    'Message' => 'Invalid argument, the ID MUST be an number',
-                ],
-                JSON_PRETTY_PRINT
-            );
-            $response->getBody()->write($emptyResult);
-            return $response->withStatus(400)->withHeader('Content-Type', 'application/json');
-        } else {
-            $objetCustomerId = new customerRequest();
-            $resultQueryId = $objetCustomerId->getId($arg['id']);
-
-            //Check if the response from the DB is empty and return an error message in this case.
-            if (empty($resultQueryId)) {
-                $emptyResult = json_encode(
-                    [
-                        'status' => 'error',
-                        'Message' =>
-                            'The item ' .
-                            $arg['id'] .
-                            ' you requested do not exist',
-                    ],
-                    JSON_PRETTY_PRINT
-                );
-                $response->getBody()->write($emptyResult);
-                return $response->withStatus(404)->withHeader(
-                    'Content-Type',
-                    'application/json'
-                );
-            }
-
-            //Return the Customer ID in an json object
-            $encodeResult = json_encode($resultQueryId, JSON_PRETTY_PRINT);
-            $response->getBody()->write($encodeResult);
-            return $response->withHeader('Content-Type', 'application/json');
-        }
+    //Check the number of params and their filters.
+    else {
+        return $objectCheckParams->paramsValidator(
+            $objetCustomersList,
+            $numberOfKeys,
+            $response,
+            $errorArray,
+            $valueOfFirstKey,
+            $allowedFilters,
+            $valueOfSecondKey,
+            $allowedSecondFilter,
+            $params
+        );
     }
+}
 
     public function CreateNewcustomer(
         Request $request,

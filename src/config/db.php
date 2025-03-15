@@ -5,7 +5,7 @@
 class db
 {
     private $configuracion = [
-        'dsn' => 'mysql:host=localhost;dbname=db775411928;charset=utf8',
+        'dsn' => 'mysql:host=localhost;dbname=yourdbname;charset=utf8',
         'usuario' => 'root',
         'clave' => '',
     ];

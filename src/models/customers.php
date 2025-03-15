@@ -18,6 +18,23 @@ class customers
         return $consulta->fetchAll(\PDO::FETCH_OBJ);
     }
 
+    public function getFilter($nameOfFilter, $firstParam)
+    {
+    $sql = "
+    SELECT
+        id, tipo, marca, nombre, activo, destacado, last_update
+    FROM bares WHERE  
+    ";
+    $sql .= $nameOfFilter . "= :filter";
+    $sql .= " ORDER by id ASC, nombre ASC";
+    $dbh = new connection();
+    $pdoContent = $dbh->obtenerPDO();
+    $consulta = $pdoContent->prepare($sql);
+    $consulta->bindValue(':filter', $firstParam, \PDO::PARAM_STR);
+    $consulta->execute();
+    return $consulta->fetchAll(\PDO::FETCH_ASSOC); 
+    }
+
     public function getId($theId)
     {
         $sql = "
